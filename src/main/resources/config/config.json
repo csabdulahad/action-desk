@@ -1,0 +1,10 @@
+{
+   "always_on_top": true,
+   "focus_search": false,
+   "command_line": "pwsh",
+   "socket_port": 5050,
+   "auto_restart": true,
+   "theme": "dark",
+   "hide_after_action": true,
+   "start_minimized": false
+}

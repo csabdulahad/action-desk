@@ -118,7 +118,7 @@ class ActionProcessPanel : JPanel() {
 		 * Name + num of process
 		 * */
 		val name = JLabel(action.name)
-		val processWord = if (numOfChild > 1) "process" else "processes"
+		val processWord = if (numOfChild > 1) "processes" else "process"
 		
 		val numOfProcess = JLabel("$numOfChild $processWord")
 		numOfProcess.font = numOfProcess.getFont().deriveFont(11.5f)

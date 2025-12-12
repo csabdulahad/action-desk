@@ -179,7 +179,13 @@ object ActionDesk : JDialog() {
 			about.addActionListener {
 				About(ActionDesk)
 			}
-			
+
+			val restart  = JMenuItem("Restart").apply {
+				addActionListener {
+					CommonActions.restartActionDesk()
+				}
+			}
+
 			val exit  = JMenuItem("Exit").apply {
 				icon = Icons.CLOSE.icon()
 				addActionListener {
@@ -193,6 +199,7 @@ object ActionDesk : JDialog() {
 			add(settings)
 			add(about)
 			add(JSeparator())
+			add(restart)
 			add(exit)
 		}
 	}

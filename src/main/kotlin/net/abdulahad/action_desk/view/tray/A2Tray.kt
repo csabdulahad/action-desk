@@ -5,6 +5,7 @@ import net.abdulahad.action_desk.lib.tray.Tray
 import net.abdulahad.action_desk.view.tray.menu.SettingsMenu
 import net.abdulahad.action_desk.view.tray.menu.ExitMenu
 import net.abdulahad.action_desk.view.tray.menu.HomeMenu
+import net.abdulahad.action_desk.view.tray.menu.RestartMenu
 
 class A2Tray : Tray(ID, ICON) {
 	
@@ -17,6 +18,7 @@ class A2Tray : Tray(ID, ICON) {
 		addMenu(
 			HomeMenu(),
 			SettingsMenu(),
+			RestartMenu(),
 			ExitMenu()
 		)
 	}

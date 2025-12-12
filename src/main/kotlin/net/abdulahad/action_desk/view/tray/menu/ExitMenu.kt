@@ -14,5 +14,6 @@ class ExitMenu: TrayItem(ID){
 	
 	override fun prepareMenu(): MenuItem = newMenuItem("Exit", "icon/close_16.png")
 	
-	override fun hasSeparatorAbove(): Boolean = true
+	override fun hasSeparatorAbove(): Boolean = false
+
 }

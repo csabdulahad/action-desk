@@ -75,7 +75,7 @@ object Bootstrap {
 			App.logInfo("ActionDesk: starting actions with AD")
 			
 			actions.forEach { action ->
-				ActionRunner.runAction(action, diagnose = false, bypassHideAfterAction = true)
+				ActionRunner.runAction(action, diagnose = false, bootupRun = true)
 			}
 		}
 	}

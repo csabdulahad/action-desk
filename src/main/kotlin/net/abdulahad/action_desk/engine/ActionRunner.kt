@@ -45,14 +45,18 @@ object ActionRunner {
 		return@withContext null
 	}
 	
-	fun runAction(action: Action, diagnose: Boolean, bypassHideAfterAction: Boolean = false) {
+	fun runAction(action: Action, diagnose: Boolean, bootupRun: Boolean = false) {
 		if (diagnose) {
 			App.logInfo("${action.name}: attempting diagnose run")
 		} else {
 			App.logInfo("${action.name}: attempting to run")
 		}
 		
-		if (action.singleton && ActionManager.isRunning(action)) {
+		if (
+			action.singleton &&
+			ActionManager.isRunning(action) &&
+			!bootupRun
+		) {
 			val msg = "${action.name}: already running"
 			
 			println(msg)
@@ -62,7 +66,7 @@ object ActionRunner {
 			return
 		}
 		
-		if (!bypassHideAfterAction && hideAfterAction) {
+		if (!bootupRun && hideAfterAction) {
 			ActionDesk.hideFrame()
 		}
 		

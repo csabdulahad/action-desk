@@ -52,17 +52,15 @@ object ActionRunner {
 			App.logInfo("${action.name}: attempting to run")
 		}
 		
-		if (
-			action.singleton &&
-			ActionManager.isRunning(action) &&
-			!bootupRun
-		) {
-			val msg = "${action.name}: already running"
-			
-			println(msg)
-			App.logWarn(msg)
-			Alert.confirm(msg).title("Singleton").show(ActionDesk)
-			
+		if (action.singleton && ActionManager.isRunning(action)) {
+			if (!bootupRun) {
+				val msg = "${action.name}: already running"
+
+				println(msg)
+				App.logWarn(msg)
+				Alert.confirm(msg).title("Singleton").show(ActionDesk)
+			}
+
 			return
 		}
 		

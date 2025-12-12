@@ -2,14 +2,10 @@ package net.abdulahad.action_desk
 
 import com.sun.jna.platform.win32.User32
 import com.sun.jna.platform.win32.WinUser
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import net.abdulahad.action_desk.dao.ActionDao
 import net.abdulahad.action_desk.data.Env
-import net.abdulahad.action_desk.engine.ActionRunner
 import net.abdulahad.action_desk.helper.CommonActions
 import net.abdulahad.action_desk.helper.ProcessHelper
+import net.abdulahad.action_desk.job.StartupJobs
 import net.abdulahad.action_desk.lib.tray.TrayMan
 import net.abdulahad.action_desk.lib.util.Alert
 import net.abdulahad.action_desk.view.ActionDesk
@@ -37,7 +33,7 @@ object Bootstrap {
 	private const val VK_BACKTICK: Int = 0xC0
 	
 	private const val HOTKEY_ID: Int = 1
-	
+
 	fun kickoff(args: Map<String, String>) {
 		try {
 			Env.init(args)
@@ -55,8 +51,10 @@ object Bootstrap {
 			
 			TrayMan.install(A2Tray::class.java)
 			
-			runWithADActions()
-			setupShortcut()
+			StartupJobs.runAutoStartActions()
+			StartupJobs.validateADAutoStartLink()
+
+			registerADGlobalShortcut()
 		} catch (e: java.lang.Exception) {
 			try {
 				App.logErr(e.stackTrace.toString())
@@ -66,21 +64,7 @@ object Bootstrap {
 		}
 	}
 	
-	private fun runWithADActions() {
-		CoroutineScope(Dispatchers.Default).launch {
-			val actions = ActionDao.fetchAutoRunActions()
-			
-			if (actions.isEmpty()) return@launch
-			
-			App.logInfo("ActionDesk: starting actions with AD")
-			
-			actions.forEach { action ->
-				ActionRunner.runAction(action, diagnose = false, bootupRun = true)
-			}
-		}
-	}
-	
-	private fun setupShortcut() {
+	private fun registerADGlobalShortcut() {
 		val user32 = User32.INSTANCE
 		
 		if (!user32.RegisterHotKey(

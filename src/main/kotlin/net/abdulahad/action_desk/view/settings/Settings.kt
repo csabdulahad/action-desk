@@ -1,6 +1,6 @@
 package net.abdulahad.action_desk.view.settings
 
-import net.abdulahad.action_desk.data.AppConfig
+import net.abdulahad.action_desk.config.ConfigService
 import net.abdulahad.action_desk.helper.Icons.icon
 import net.abdulahad.action_desk.helper.ViewHelper
 import net.abdulahad.action_desk.view.ActionDesk
@@ -120,7 +120,7 @@ class Settings() : JDialog(ActionDesk) {
 				(panel as SettingsPanel).saveConfig()
 			}
 			
-			AppConfig.flush()
+			ConfigService.flush()
 			ViewHelper.closeDialogWithEvent(this)
 		}
 		

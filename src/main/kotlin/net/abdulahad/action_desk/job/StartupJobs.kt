@@ -5,7 +5,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import net.abdulahad.action_desk.App
 import net.abdulahad.action_desk.dao.ActionDao
-import net.abdulahad.action_desk.data.AppConfig
+import net.abdulahad.action_desk.config.AppConfig
 import net.abdulahad.action_desk.data.AppValues
 import net.abdulahad.action_desk.engine.ActionRunner
 import java.io.File

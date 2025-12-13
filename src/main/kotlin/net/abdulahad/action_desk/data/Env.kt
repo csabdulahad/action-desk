@@ -1,8 +1,8 @@
 package net.abdulahad.action_desk.data
 
 import net.abdulahad.action_desk.App
+import net.abdulahad.action_desk.config.ConfigService
 import net.abdulahad.action_desk.helper.ResourceHelper
-import net.abdulahad.action_desk.lib.json.JsonObjectLoader
 import net.abdulahad.action_desk.lib.util.Poth
 import net.abdulahad.action_desk.lib.util.Pref
 import net.abdulahad.action_desk.normalizeSlashes
@@ -17,10 +17,6 @@ object Env {
 	private lateinit var appFolder: String
 	val APP_FOLDER: String
 		get() = appFolder
-	
-	lateinit var config: JsonObjectLoader
-	val CONFIG: JsonObjectLoader
-		get() = config
 	
 	fun printSystemProperties() {
 		val path = System.getProperties()
@@ -102,36 +98,15 @@ object Env {
 		val logPath = "$appFolder/logs"
 		System.setProperty("app.log.dir", logPath)
 		
-		val configPath = "$appFolder/config.json"
-		loadConfig(configPath)
-		
 		checkDB("$appFolder/action_desk.db")
+		
+		ConfigService.loadConfig()
 		
 		createFolder("$appFolder/icons")
 		createFile("$appFolder/icons.txt")
 		
 		ResourceHelper.copyResourceFile("config/action_desk.ico", "$appFolder/action_desk.ico")
 		ResourceHelper.copyResourceFolder("scripts", "$appFolder/scripts")
-	}
-	
-	private fun getDefaultConfigJSON(): String {
-		val stream = Poth.getAsStream("config/config.json")
-		val json = stream?.bufferedReader()?.use { it.readText() }
-		
-		if (json == null) {
-			runtimeException("Failed to clone config.json", true)
-			return ""
-		}
-		
-		return json.trimIndent()
-	}
-	
-	private fun loadConfig(configPath: String) {
-		createFile(configPath) { file ->
-			writeToFile(file, getDefaultConfigJSON())
-		}
-		
-		config = JsonObjectLoader(configPath)
 	}
 	
 	private fun setupAppFolders(path: String) {

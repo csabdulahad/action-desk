@@ -1,7 +1,7 @@
 package net.abdulahad.action_desk.view.settings.panel
 
 import com.formdev.flatlaf.extras.components.FlatCheckBox
-import net.abdulahad.action_desk.data.AppConfig
+import net.abdulahad.action_desk.config.AppConfig
 import net.abdulahad.action_desk.view.settings.SettingsPanel
 import org.jdesktop.swingx.VerticalLayout
 import java.awt.Window

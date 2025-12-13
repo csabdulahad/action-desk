@@ -1,6 +1,7 @@
-package net.abdulahad.action_desk.data
+package net.abdulahad.action_desk.config
 
 import com.formdev.flatlaf.FlatLaf
+import net.abdulahad.action_desk.data.AppValues
 import net.abdulahad.action_desk.engine.ActionRunner
 import net.abdulahad.action_desk.helper.CommonActions
 import net.abdulahad.action_desk.lib.tray.TrayMan
@@ -11,12 +12,6 @@ import java.io.File
 import javax.swing.SwingUtilities
 
 object AppConfig {
-
-	fun flush() {
-		Env.CONFIG.save()
-	}
-	
-	
 	/*
 	 * Auto run
 	 * */
@@ -40,11 +35,11 @@ object AppConfig {
 		val current = getAutoRun()
 		if (apply && current != enable) applyAutoRun(enable)
 		
-		Env.config.set("auto_restart", enable)
+		ConfigService.commit(ConfigKeys.AUTOSTART, enable)
 	}
 	
 	fun getAutoRun() : Boolean {
-		return Env.config.path("auto_restart").bool(true)
+		return ConfigService.getBool(ConfigKeys.AUTOSTART, true)
 	}
 	
 	fun isAutoRestarting(): Boolean {
@@ -57,11 +52,11 @@ object AppConfig {
 	 * Start minimized
 	 * */
 	fun setStartMinimized(enable: Boolean, apply: Boolean = false) {
-		Env.config.set("start_minimized", enable)
+		ConfigService.commit(ConfigKeys.START_MINIMIZED, enable)
 	}
 	
 	fun getStartMinimized(): Boolean {
-		return Env.config.path("start_minimized").bool(true)
+		return ConfigService.getBool(ConfigKeys.START_MINIMIZED, true)
 	}
 	
 	
@@ -70,12 +65,12 @@ object AppConfig {
 	 * */
 	fun applyTheme(theme: String) {
 		SwingUtilities.invokeLater {
-			ThemeDescriptor
+			ThemeDescriptor.Companion
 				.getByThemeName(theme)
 				.classRef.java.getMethod("setup")
 				.invoke(null)
 			
-			TrayMan.reinstall(A2Tray.ID, A2Tray::class.java)
+			TrayMan.reinstall(A2Tray.Companion.ID, A2Tray::class.java)
 			FlatLaf.updateUI()
 		}
 	}
@@ -86,11 +81,11 @@ object AppConfig {
 		
 		if (apply && current != t) applyTheme(t)
 		
-		Env.config.set("theme", t)
+		ConfigService.commit(ConfigKeys.THEME, t)
 	}
 	
 	fun getTheme(): String {
-		return Env.config.getString("theme", "light")!!.lowercase()
+		return ConfigService.getString(ConfigKeys.THEME, "light").lowercase()
 	}
 	
 	
@@ -105,11 +100,11 @@ object AppConfig {
 		val current = getSearchFocus()
 		if (apply && current != enable) applySearchFocus(enable)
 		
-		Env.config.set("focus_search", enable)
+		ConfigService.commit(ConfigKeys.FOCUS_SEARCH, enable)
 	}
 	
 	fun getSearchFocus(): Boolean {
-		return Env.config.path("focus_search").bool(true)
+		return ConfigService.getBool(ConfigKeys.FOCUS_SEARCH, true)
 	}
 	
 	
@@ -124,11 +119,11 @@ object AppConfig {
 		val current = getAlwaysOnTop()
 		if (apply && current != enable) applyAlwaysOnTop(enable)
 		
-		Env.config.set("always_on_top", enable)
+		ConfigService.commit(ConfigKeys.ALWAYS_ON_TOP, enable)
 	}
 	
 	fun getAlwaysOnTop(): Boolean {
-		return Env.config.path("always_on_top").bool(true)
+		return ConfigService.getBool(ConfigKeys.ALWAYS_ON_TOP, true)
 	}
 	
 	
@@ -143,10 +138,11 @@ object AppConfig {
 		val current = getHideAfterAction()
 		if (apply && current != enable) applyHideAfterAction(enable)
 		
-		Env.config.set("hide_after_action", enable)
+		ConfigService.commit(ConfigKeys.HIDE_AFTER_ACTION, enable)
 	}
 	
 	fun getHideAfterAction(): Boolean {
-		return Env.config.path("hide_after_action").bool(true)
+		return ConfigService.getBool(ConfigKeys.HIDE_AFTER_ACTION, true)
 	}
+	
 }

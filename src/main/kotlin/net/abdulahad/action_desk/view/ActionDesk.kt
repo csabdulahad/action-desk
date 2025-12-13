@@ -4,7 +4,9 @@ import com.formdev.flatlaf.extras.FlatSVGIcon
 import com.formdev.flatlaf.extras.components.FlatButton
 import com.formdev.flatlaf.extras.components.FlatPopupMenu
 import net.abdulahad.action_desk.App
-import net.abdulahad.action_desk.data.AppConfig
+import net.abdulahad.action_desk.config.ConfigKeys
+import net.abdulahad.action_desk.config.ConfigService
+import net.abdulahad.action_desk.config.AppConfig
 import net.abdulahad.action_desk.helper.CommonActions
 import net.abdulahad.action_desk.data.Env
 import net.abdulahad.action_desk.helper.Icons
@@ -225,9 +227,8 @@ object ActionDesk : JDialog() {
 	private fun watchWindowMovement() {
 		addComponentListener(object: ComponentAdapter() {
 			override fun componentMoved(e: ComponentEvent?) {
-				Env.CONFIG.set("win_pos_x", locationOnScreen.x)
-				Env.CONFIG.set("win_pos_y", locationOnScreen.y)
-				Env.CONFIG.save()
+				ConfigService.commit(ConfigKeys.WIN_POS_X, locationOnScreen.x)
+				ConfigService.commit(ConfigKeys.WIN_POS_Y, locationOnScreen.y)
 			}
 		})
 	}
@@ -315,8 +316,8 @@ object ActionDesk : JDialog() {
 		}
 		
 		if (show) {
-			val x = Env.CONFIG.path("win_pos_x").int(-1)
-			val y = Env.CONFIG.path("win_pos_y").int(-1)
+			val x = ConfigService.getInt(ConfigKeys.WIN_POS_X, -1)
+			val y = ConfigService.getInt(ConfigKeys.WIN_POS_Y, -1)
 			
 			if (x == -1 && y == -1) {
 				setLocationRelativeTo(null)

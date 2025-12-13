@@ -3,7 +3,8 @@ package net.abdulahad.action_desk.view.tray.menu
 import com.formdev.flatlaf.FlatLaf
 import com.formdev.flatlaf.extras.FlatSVGUtils
 import dorkbox.systemTray.MenuItem
-import net.abdulahad.action_desk.data.Env
+import net.abdulahad.action_desk.config.ConfigKeys
+import net.abdulahad.action_desk.config.ConfigService
 import net.abdulahad.action_desk.lib.tray.TrayItem
 import net.abdulahad.action_desk.lib.tray.TrayMan
 import net.abdulahad.action_desk.model.ThemeDescriptor
@@ -21,7 +22,7 @@ class ThemeMenu: TrayItem(ID) {
 		val settings = newMenu("Theme", "icon/brush_16.png")
 		
 		val checkedIcon = FlatSVGUtils.svg2image("/icon/checked.svg", 16, 16)
-		val currentTheme = Env.CONFIG.path("theme").string("dark")!!
+		val currentTheme = ConfigService.getString(ConfigKeys.THEME, "dark")
 		
 		listOf<MenuItem>(
 			newMenuItem("Light"),
@@ -45,8 +46,8 @@ class ThemeMenu: TrayItem(ID) {
 	private fun toggleTheme(theme: String) {
 		val themeLower = theme.lowercase()
 		
-		Env.CONFIG.set("theme", themeLower)
-		Env.CONFIG.save()
+		ConfigService.commit(ConfigKeys.THEME, themeLower)
+		ConfigService.flush()
 		
 		SwingUtilities.invokeLater {
 			ThemeDescriptor

@@ -1,4 +1,4 @@
-package net.abdulahad.action_desk
+package net.abdulahad.action_desk.model
 
 import java.io.File
 

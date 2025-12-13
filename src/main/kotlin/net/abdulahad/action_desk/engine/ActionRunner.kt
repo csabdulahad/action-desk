@@ -2,7 +2,7 @@ package net.abdulahad.action_desk.engine
 
 import kotlinx.coroutines.*
 import net.abdulahad.action_desk.App
-import net.abdulahad.action_desk.data.AppConfig
+import net.abdulahad.action_desk.config.AppConfig
 import net.abdulahad.action_desk.engine.executor.ActionExecutor
 import net.abdulahad.action_desk.helper.CommonActions
 import net.abdulahad.action_desk.helper.ProcessHelper

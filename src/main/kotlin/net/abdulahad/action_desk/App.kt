@@ -4,7 +4,8 @@ import com.formdev.flatlaf.FlatLaf
 import com.formdev.flatlaf.icons.FlatWindowCloseIcon
 import com.formdev.flatlaf.icons.FlatWindowIconifyIcon
 import com.formdev.flatlaf.util.UIScale
-import net.abdulahad.action_desk.data.Env.CONFIG
+import net.abdulahad.action_desk.config.ConfigKeys
+import net.abdulahad.action_desk.config.ConfigService
 import net.abdulahad.action_desk.model.ThemeDescriptor
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -138,7 +139,7 @@ object App {
 	}
 	
 	private fun loadLookAndFeel() {
-		val themeName = CONFIG.path("theme").string("") ?: "Dark"
+		val themeName = ConfigService.getString(ConfigKeys.THEME, "dark")
 		
 		try {
 			val theme = ThemeDescriptor.getByThemeName(themeName).createInstance()
@@ -162,27 +163,27 @@ object App {
 	}
 	
 	fun getPSBin(): String {
-		return CONFIG.path("command_line").string("powershell") ?: "powershell"
+		return ConfigService.getString(ConfigKeys.COMMAND_LINE, "powershell")
 	}
 	
 	fun getSearchFocus(): Boolean {
-		return CONFIG.path("focus_search").bool(true)
+		return ConfigService.getBool(ConfigKeys.FOCUS_SEARCH, true)
 	}
 
 	fun getActionDeskPin(): Boolean {
-		return CONFIG.path("always_on_top").bool(true)
+		return ConfigService.getBool(ConfigKeys.ALWAYS_ON_TOP, true)
 	}
 	
 	fun getHideAfterAction(): Boolean {
-		return CONFIG.path("hide_after_action").bool(true)
+		return ConfigService.getBool(ConfigKeys.HIDE_AFTER_ACTION, true)
 	}
 	
 	fun getStartMinimized(): Boolean {
-		return CONFIG.path("start_minimized").bool(false)
+		return ConfigService.getBool(ConfigKeys.START_MINIMIZED, false)
 	}
 	
 	fun getAutoRestart(): Boolean {
-		return CONFIG.path("auto_restart").bool(false)
+		return ConfigService.getBool(ConfigKeys.AUTOSTART, false)
 	}
 	
 	fun close() {

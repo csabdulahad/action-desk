@@ -20,8 +20,4 @@ class SettingsMenu: TrayItem(ID) {
 	
 	override fun prepareMenu(): MenuItem = newMenuItem("Settings", "icon/setting_16.png")
 	
-	override fun hasSeparatorAbove(): Boolean {
-		return true
-	}
-	
 }

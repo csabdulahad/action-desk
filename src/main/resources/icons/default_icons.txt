@@ -92,6 +92,7 @@ showIgnored
 showPassed
 spark
 structure
+systemTheme
 target
 testCustom
 testUnknown
@@ -109,3 +110,4 @@ watch
 web
 xhtml
 xml
+microsoftWindows

@@ -1,9 +1,9 @@
-package net.abdulahad.action_desk.engine.executor
+package net.abdulahad.action_desk.engine.action.executor
 
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import net.abdulahad.action_desk.App
+import net.abdulahad.action_desk.config.AppConfig
 import net.abdulahad.action_desk.model.PSAction
 import java.io.File
 import java.util.*
@@ -12,7 +12,7 @@ import java.util.concurrent.TimeUnit
 object PSExecutor {
 	
 	private val runningActionList = mutableSetOf<String>()
-	private val psBin = App.getPSBin()
+	private val psBin = AppConfig.getPSBin()
 	
 	// PowerShell requires Base64 encoded string in UTF-16LE for -EncodedCommand
 	fun encodeToBase64Utf16LE(command: String): String {

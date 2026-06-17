@@ -1,17 +1,24 @@
-package net.abdulahad.action_desk.engine
+package net.abdulahad.action_desk.engine.action
 
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import net.abdulahad.action_desk.App
 import net.abdulahad.action_desk.config.AppConfig
-import net.abdulahad.action_desk.engine.executor.ActionExecutor
+import net.abdulahad.action_desk.engine.action.executor.ActionExecutor
 import net.abdulahad.action_desk.helper.CommonActions
 import net.abdulahad.action_desk.helper.ProcessHelper
 import net.abdulahad.action_desk.lib.util.Alert
+import net.abdulahad.action_desk.lib.windows.WinHelper
 import net.abdulahad.action_desk.model.Action
 import net.abdulahad.action_desk.view.ActionDesk
+import net.abdulahad.action_desk.engine.notification.NotificationManager
 import java.io.File
 import java.nio.file.Files
 import java.nio.file.StandardOpenOption
+import kotlin.time.Duration.Companion.milliseconds
 
 object ActionRunner {
 	
@@ -34,7 +41,7 @@ object ActionRunner {
 				}
 			}
 			
-			delay(interval)
+			delay(interval.milliseconds)
 		}
 		
 		val msg = "grabPID: Timed out awaiting PID read from $filePath"
@@ -46,22 +53,42 @@ object ActionRunner {
 	}
 	
 	fun runAction(action: Action, diagnose: Boolean, bootupRun: Boolean = false) {
+		val byShortcut = action.byShortcut
+		action.byShortcut = false
+		
 		if (diagnose) {
 			App.logInfo("${action.name}: attempting diagnose run")
 		} else {
 			App.logInfo("${action.name}: attempting to run")
 		}
 		
+		val pid = ActionManager.getActionPID(action)
+		
+		if (action.singleton && action.bringWindow && pid != null) {
+			WinHelper.bringWindowInFrontByPID(pid)
+			return
+		}
+		
 		if (action.singleton && ActionManager.isRunning(action)) {
 			if (!bootupRun) {
-				val msg = "${action.name}: already running"
+				val msg = "${action.name} is already running"
 
-				println(msg)
 				App.logWarn(msg)
-				Alert.confirm(msg).title("Singleton").show(ActionDesk)
+				NotificationManager.info(msg)
+				
+				if (App.isShown()) {
+					App.setMessage(msg)
+				} else {
+					Alert.confirm(msg).title("Singleton").show(ActionDesk)
+				}
 			}
 
 			return
+		}
+		
+		if (!diagnose) {
+			App.setMessage("Last action: ${action.name}")
+			NotificationManager.info("Last action: ${action.name}", isSilent = !byShortcut)
 		}
 		
 		if (!bootupRun && hideAfterAction) {
@@ -95,7 +122,9 @@ object ActionRunner {
 				
 				ActionExecutor.execute(action, diagnose)
 				
-				val	pid = grabPIDFromLockFile(path)
+				val pid = grabPIDFromLockFile(path)
+				
+				ActionManager.registerActionPID(action.id, pid)
 				
 				val msg = "PID by grabPID: $pid"
 				println(msg)

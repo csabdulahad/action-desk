@@ -1,9 +1,10 @@
 package net.abdulahad.action_desk.helper
 
 import net.abdulahad.action_desk.App
+import net.abdulahad.action_desk.config.AppConfig
 import net.abdulahad.action_desk.data.AppValues
 import net.abdulahad.action_desk.data.Env
-import net.abdulahad.action_desk.engine.executor.PSExecutor
+import net.abdulahad.action_desk.engine.action.executor.PSExecutor
 import net.abdulahad.action_desk.lib.util.Alert
 import net.abdulahad.action_desk.model.PSAction
 import net.abdulahad.action_desk.view.ActionDesk
@@ -17,7 +18,7 @@ object CommonActions {
 		val command = if (elevated) {
 			// Use Start-Process to re-run pwsh with RunAs
 			listOf(
-				App.getPSBin(),
+				AppConfig.getPSBin(),
 				"-NoProfile",
 				"-NoLogo",
 				"-NonInteractive",
@@ -26,7 +27,7 @@ object CommonActions {
 			)
 		} else {
 			listOf(
-				App.getPSBin(),
+				AppConfig.getPSBin(),
 				"-NoProfile",
 				"-NoLogo",
 				"-NonInteractive",
@@ -51,7 +52,7 @@ object CommonActions {
 	
 	fun openFolder(path: String) {
 		App.logInfo("Folder opened: $path")
-		ProcessBuilder(App.getPSBin(), "-Command", "Start-Process", """"$path"""").start()
+		ProcessBuilder(AppConfig.getPSBin(), "-Command", "Start-Process", """"$path"""").start()
 	}
 	
 	fun writeToFile(file: File, text: String, append: Boolean = false) {
@@ -86,7 +87,7 @@ object CommonActions {
 		val base64 = PSExecutor.encodeToBase64Utf16LE(cmd)
 		
 		val powershellCmd = listOf(
-			App.getPSBin(),
+			AppConfig.getPSBin(),
 			"-NoProfile",
 			"-NoLogo",
 			"-NonInteractive",

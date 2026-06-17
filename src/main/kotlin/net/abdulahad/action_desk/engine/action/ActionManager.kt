@@ -1,14 +1,16 @@
-package net.abdulahad.action_desk.engine
+package net.abdulahad.action_desk.engine.action
 
-import net.abdulahad.action_desk.model.ActionProcess
 import net.abdulahad.action_desk.App
 import net.abdulahad.action_desk.data.Env
 import net.abdulahad.action_desk.helper.ProcessHelper
 import net.abdulahad.action_desk.model.Action
+import net.abdulahad.action_desk.model.ActionProcess
 import java.io.File
 import kotlin.math.abs
 
 object ActionManager {
+	
+	private val actionPID = mutableMapOf<Int, Long>()
 	
 	fun getPIDLockFiles(actionId: Int): ActionProcess {
 		val pidFolder = Env.getPIDFolder()
@@ -152,6 +154,25 @@ object ActionManager {
 		return descendants
 	}
 	
+	fun getActionPID(action: Action): Long? {
+		val pid = actionPID[action.id] ?: return null
+		
+		val process = ProcessBuilder("cmd", "/c", "tasklist /FI \"PID eq $pid\" /nh")
+			.redirectErrorStream(true)
+			.start()
+		
+		val output = process.inputStream.bufferedReader().use { it.readText() }.trim()
+		val lines = output.lines().filter { it.isNotBlank() }
+		val numOfLines = lines.size
+		
+		if (output.contains("No tasks are running") || numOfLines != 1) {
+			actionPID.remove(action.id)
+			return null
+		}
+		
+		return pid
+	}
+	
 	fun isRunning(action: Action): Boolean {
 		val actionProcess = getPIDLockFiles(action.id)
 		val pidList: MutableSet<Long> = actionProcess.pidFiles.keys
@@ -200,6 +221,20 @@ object ActionManager {
 		}
 		
 		return !alivePIDs.isEmpty()
+	}
+	
+	fun registerActionPID(actionId: Int, pid: Long?) {
+		if (pid == null) {
+			val removed = actionPID.remove(actionId)
+			if (removed != null) {
+				val msg = "Zombie action PID discovered"
+				println(msg)
+				App.logWarn(msg)
+			}
+			return
+		}
+		
+		actionPID[actionId] = pid
 	}
 	
 }

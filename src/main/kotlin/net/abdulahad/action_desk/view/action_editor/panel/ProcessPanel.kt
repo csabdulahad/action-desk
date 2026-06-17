@@ -8,11 +8,12 @@ import javax.swing.ButtonGroup
 import javax.swing.JPanel
 import javax.swing.JRadioButton
 
-class ProcessPanel(): JPanel(), ActionEditorPanel {
+class ProcessPanel: JPanel(), ActionEditorPanel {
 	
 	private var runAs = FlatCheckBox()
 	private var singleton = FlatCheckBox()
 	private var startWithAD = FlatCheckBox()
+	private var bringWindowFront = FlatCheckBox()
 	
 	private lateinit var group: ButtonGroup
 	
@@ -22,18 +23,29 @@ class ProcessPanel(): JPanel(), ActionEditorPanel {
 		setupPanel()
 		setupLabels()
 		addFields()
+		addSingletonCheckListener()
+	}
+	
+	private fun addSingletonCheckListener() {
+		singleton.addChangeListener {
+			if (!singleton.isSelected) {
+				bringWindowFront.isSelected = false
+			}
+		}
 	}
 	
 	private fun addFields() {
 		add(runAs)
-		add(singleton)
 		add(startWithAD)
+		add(singleton)
+		add(bringWindowFront)
 	}
 	
 	private fun setupLabels() {
-		runAs.text 		 = "Run as administrator"
-		singleton.text 	 = "Single instance"
+		runAs.text = "Run as administrator"
+		singleton.text = "Single instance"
 		startWithAD.text = "Start with ActionDesk"
+		bringWindowFront.text = "Bring Window Front"
 	}
 	
 	private fun setupPanel() {
@@ -45,6 +57,12 @@ class ProcessPanel(): JPanel(), ActionEditorPanel {
 		action.singleton = singleton.isSelected
 		action.startWithAD = startWithAD.isSelected
 		
+		if (singleton.isSelected) {
+			action.bringWindow = bringWindowFront.isSelected
+		} else {
+			action.bringWindow = false
+		}
+		
 		return null
 	}
 	
@@ -52,6 +70,10 @@ class ProcessPanel(): JPanel(), ActionEditorPanel {
 		runAs.isSelected = action.runAsAdmin
 		singleton.isSelected = action.singleton
 		startWithAD.isSelected = action.startWithAD
+		
+		if (singleton.isSelected) {
+			bringWindowFront.isSelected = action.bringWindow
+		}
 	}
 	
 }

@@ -1,13 +1,8 @@
 package net.abdulahad.action_desk.view.action_editor
 
-import net.abdulahad.action_desk.App
-import net.abdulahad.action_desk.dao.ActionDao
 import net.abdulahad.action_desk.model.Action
-import net.abdulahad.action_desk.view.action_editor.panel.CommandPanel
-import net.abdulahad.action_desk.view.action_editor.panel.GeneralPanel
-import net.abdulahad.action_desk.view.action_editor.panel.ProcessPanel
-import net.abdulahad.action_desk.view.action_editor.panel.ShortcutPanel
-import net.abdulahad.action_desk.view.action_editor.panel.WindowPanel
+import net.abdulahad.action_desk.repo.action.ActionRepo
+import net.abdulahad.action_desk.view.action_editor.panel.*
 import java.awt.*
 import java.awt.event.WindowAdapter
 import java.awt.event.WindowEvent
@@ -16,7 +11,7 @@ import javax.swing.border.MatteBorder
 
 class ActionEditor(parentFrame: Window, private var action: Action? = null) : JDialog(parentFrame) {
 	
-	private val listItems = listOf("General", "Command", "Process", "Window", "Shortcuts")
+	private val listItems = listOf("General", "Command", "Process", "Window")
 	
 	private lateinit var rightPanel: JPanel
 	private lateinit var leftScrollPane: JScrollPane
@@ -30,7 +25,6 @@ class ActionEditor(parentFrame: Window, private var action: Action? = null) : JD
 	private lateinit var commandPanel: CommandPanel
 	private lateinit var processPanel: ProcessPanel
 	private lateinit var windowPanel: WindowPanel
-	private lateinit var shortcutPanel: ShortcutPanel
 	
 	private var updateCallback: (() -> Unit)? = null
 	
@@ -74,22 +68,18 @@ class ActionEditor(parentFrame: Window, private var action: Action? = null) : JD
 		commandPanel.setData(action!!)
 		processPanel.setData(action!!)
 		windowPanel.setData(action!!)
-		shortcutPanel.setData(action!!)
 	}
 	
 	private fun initPanels() {
 		generalPanel = GeneralPanel(this)
+		generalPanel.setFeedbacker(::setFeedback)
+		
 		commandPanel = CommandPanel()
 		processPanel = ProcessPanel()
 		windowPanel = WindowPanel()
-		
-		shortcutPanel = ShortcutPanel()
-		shortcutPanel.setFeedbacker(::setFeedback)
 	}
 	
 	private fun setupDialog() {
-		App.applyCloseIcon()
-		
 		title = "New Action"
 		modalityType = ModalityType.APPLICATION_MODAL
 		defaultCloseOperation = DO_NOTHING_ON_CLOSE
@@ -127,7 +117,6 @@ class ActionEditor(parentFrame: Window, private var action: Action? = null) : JD
 			"Command"   to commandPanel,
 			"Process"   to processPanel,
 			"Window"   to windowPanel,
-			"Shortcuts" to shortcutPanel,
 		).forEach { (key, panel) ->
 			val x = JScrollPane(panel)
 			x.verticalScrollBar.unitIncrement = 12
@@ -167,7 +156,7 @@ class ActionEditor(parentFrame: Window, private var action: Action? = null) : JD
 		bottomPanel.isOpaque = false
 		bottomPanel.add(buttonPanel, BorderLayout.LINE_END)
 		
-		feedbackField.foreground = UIManager.getColor("error_color")
+		feedbackField.foreground = UIManager.getColor("AD.errorColor")
 		feedbackField.border = BorderFactory.createEmptyBorder(0, 6, 0, 0)
 		bottomPanel.add(feedbackField, BorderLayout.LINE_START)
 		
@@ -207,7 +196,6 @@ class ActionEditor(parentFrame: Window, private var action: Action? = null) : JD
 			commandPanel,
 			processPanel,
 			windowPanel,
-			shortcutPanel,
 		)
 		
 		for (panel in panels) {
@@ -221,7 +209,7 @@ class ActionEditor(parentFrame: Window, private var action: Action? = null) : JD
 			return
 		}
 		
-		ActionDao.save(action!!)
+		ActionRepo.save(action)
 		
 		if (updateCallback != null) updateCallback!!.invoke()
 		

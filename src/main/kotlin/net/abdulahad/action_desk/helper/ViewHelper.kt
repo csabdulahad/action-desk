@@ -1,7 +1,5 @@
 package net.abdulahad.action_desk.helper
 
-import net.abdulahad.action_desk.App
-import net.abdulahad.action_desk.onUI
 import java.awt.Cursor
 import java.awt.Desktop
 import java.awt.Window
@@ -36,8 +34,6 @@ object ViewHelper {
 	}
 	
 	fun hideAndSeekWindow(child: Window, parent: Window? = null, showParent: Boolean = true) {
-		onUI(App::applyCloseIcon)
-		
 		child.addWindowListener(object : WindowAdapter() {
 			override fun windowClosing(e: WindowEvent?) {
 				child.dispose()

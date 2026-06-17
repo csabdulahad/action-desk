@@ -1,15 +1,10 @@
 package net.abdulahad.action_desk.helper
 
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import net.abdulahad.action_desk.App
-import net.abdulahad.action_desk.Bootstrap
+import net.abdulahad.action_desk.*
+import net.abdulahad.action_desk.config.AppConfig
 import net.abdulahad.action_desk.data.Env
-import net.abdulahad.action_desk.engine.ActionManager
+import net.abdulahad.action_desk.engine.action.ActionManager
 import net.abdulahad.action_desk.lib.util.Alert
-import net.abdulahad.action_desk.onUI
-import net.abdulahad.action_desk.runtimeException
 import net.abdulahad.action_desk.view.ActionDesk
 import java.io.File
 import java.net.URISyntaxException
@@ -40,7 +35,7 @@ object ProcessHelper {
 	}
 	
 	fun killProcess(pid: Long, callback: ((result: Boolean) -> Unit)? = null) {
-		CoroutineScope(Dispatchers.Default).launch {
+		onDefault {
 			var success = true
 			var killMsg: String? = null
 			
@@ -98,7 +93,7 @@ object ProcessHelper {
 			 * */
 			val finalCMDList = if (isAdminProcess) {
 				listOf(
-					App.getPSBin(),
+					AppConfig.getPSBin(),
 					"-Command",
 					cmdList.joinToString(" ")
 				)

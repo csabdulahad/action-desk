@@ -3,13 +3,14 @@ package net.abdulahad.action_desk
 import com.sun.jna.platform.win32.User32
 import com.sun.jna.platform.win32.WinUser
 import net.abdulahad.action_desk.data.Env
+import net.abdulahad.action_desk.engine.shortcut.ShortcutManager
 import net.abdulahad.action_desk.helper.CommonActions
 import net.abdulahad.action_desk.helper.ProcessHelper
 import net.abdulahad.action_desk.job.StartupJobs
-import net.abdulahad.action_desk.lib.tray.TrayMan
 import net.abdulahad.action_desk.lib.util.Alert
+import net.abdulahad.action_desk.lib.util.Ben
+import net.abdulahad.action_desk.repo.action.ActionRepo
 import net.abdulahad.action_desk.view.ActionDesk
-import net.abdulahad.action_desk.view.tray.A2Tray
 import java.io.File
 import kotlin.system.exitProcess
 
@@ -36,28 +37,65 @@ object Bootstrap {
 
 	fun kickoff(args: Map<String, String>) {
 		try {
+			/*
+			 * Set up the ActionDesk env & app config
+			 * */
+			Ben.start("envSetup")
 			Env.init(args)
+			Ben.end("envSetup")
+			
+			Ben.start("appSetup")
 			App.setup()
+			Ben.end("appSetup")
+			
+			
+			/*
+			 * Check for number of running instances
+			 * */
+			Ben.start("writeInstanceLock")
 			
 			if (!writeInstanceLock()) {
 				return
 			}
 			
+			Ben.end("writeInstanceLock")
+			Ben.endAllPrint("Bootstrap Report")
+			
 			App.logInfo("ActionDesk started")
 			
+			
+			/*
+			 * Start the UI
+			 * */
 			if (!App.getStartMinimized()) {
 				ActionDesk.showFrame()
 			}
 			
-			TrayMan.install(A2Tray::class.java)
 			
-			StartupJobs.runAutoStartActions()
-			StartupJobs.validateADAutoStartLink()
-
-			registerADGlobalShortcut()
+			/*
+			 * Initialize shortcut manager service
+			 * */
+			ShortcutManager.startShortcutListener()
+			
+			
+			/*
+			 * Background startup jobs
+			 * */
+			onDefault {
+				StartupJobs.registerADHotkey()
+				StartupJobs.validateADAutoStartLink()
+				StartupJobs.runAutoStartActions()
+				StartupJobs.installTray()
+			}
+			
+			
+			/*
+			 * Finally load the Actions ⚡
+			 * */
+			ActionRepo.init()
 		} catch (e: java.lang.Exception) {
 			try {
-				App.logErr(e.stackTrace.toString())
+				App.logErr(e.stackTrace.contentToString())
 			} catch (_: Exception) {}
 			
 			e.printStackTrace()
@@ -87,7 +125,8 @@ object Bootstrap {
 				val id = msg.wParam.toInt()
 				
 				if (id == HOTKEY_ID) {
-					ActionDesk.showFrame()
+					println(Thread.currentThread().name)
+					onSwing(ActionDesk::showFrame)
 				}
 			}
 		}

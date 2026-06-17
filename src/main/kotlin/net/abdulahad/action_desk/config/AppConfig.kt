@@ -2,12 +2,15 @@ package net.abdulahad.action_desk.config
 
 import com.formdev.flatlaf.FlatLaf
 import net.abdulahad.action_desk.data.AppValues
-import net.abdulahad.action_desk.engine.ActionRunner
+import net.abdulahad.action_desk.engine.action.ActionRunner
+import net.abdulahad.action_desk.engine.shortcut.ActionDeskHKAction
+import net.abdulahad.action_desk.engine.shortcut.ShortcutManager
 import net.abdulahad.action_desk.helper.CommonActions
 import net.abdulahad.action_desk.lib.tray.TrayMan
 import net.abdulahad.action_desk.model.ThemeDescriptor
 import net.abdulahad.action_desk.view.ActionDesk
 import net.abdulahad.action_desk.view.tray.A2Tray
+import java.awt.Point
 import java.io.File
 import javax.swing.SwingUtilities
 
@@ -65,12 +68,12 @@ object AppConfig {
 	 * */
 	fun applyTheme(theme: String) {
 		SwingUtilities.invokeLater {
-			ThemeDescriptor.Companion
+			ThemeDescriptor
 				.getByThemeName(theme)
 				.classRef.java.getMethod("setup")
 				.invoke(null)
 			
-			TrayMan.reinstall(A2Tray.Companion.ID, A2Tray::class.java)
+			TrayMan.reinstall(A2Tray.ID, A2Tray::class.java)
 			FlatLaf.updateUI()
 		}
 	}
@@ -92,19 +95,22 @@ object AppConfig {
 	/*
 	 * Search bar focus
 	 * */
-	fun applySearchFocus(enable: Boolean) {
-		ActionDesk.applyFocusSearch(enable)
+	fun applyWindowSize(value: Point) {
+		ActionDesk.applyWindowSize(value)
 	}
 	
-	fun setSearchFocus(enable: Boolean, apply: Boolean = false) {
-		val current = getSearchFocus()
-		if (apply && current != enable) applySearchFocus(enable)
+	fun setWindowSize(value: Point, apply: Boolean = false) {
+		val current = getWindowSize()
 		
-		ConfigService.commit(ConfigKeys.FOCUS_SEARCH, enable)
+		if (apply && current != value) applyWindowSize(value)
+		
+		ConfigService.commit(ConfigKeys.WINDOW_SIZE, "${value.x}x${value.y}")
 	}
 	
-	fun getSearchFocus(): Boolean {
-		return ConfigService.getBool(ConfigKeys.FOCUS_SEARCH, true)
+	fun getWindowSize(): Point {
+		val value  = ConfigService.getString(ConfigKeys.WINDOW_SIZE, "450x500")
+		val values = value.split("x")
+		return Point(values[0].toInt(), values[1].toInt())
 	}
 	
 	
@@ -143,6 +149,66 @@ object AppConfig {
 	
 	fun getHideAfterAction(): Boolean {
 		return ConfigService.getBool(ConfigKeys.HIDE_AFTER_ACTION, true)
+	}
+	
+	
+	/*
+	 * Enable auto start actions setting
+	 * */
+	fun getEnableAutoStartActions(): Boolean {
+		return ConfigService.getBool(ConfigKeys.ENABLE_AUTO_START_ACTIONS, true)
+	}
+	
+	fun setEnableAutoStartActions(value: Boolean) {
+		ConfigService.commit(ConfigKeys.ENABLE_AUTO_START_ACTIONS, value)
+	}
+	
+	
+	/*
+	 * ActionDesk window in center
+	 * */
+	fun getShowWindowInCenter(): Boolean {
+		return ConfigService.getBool(ConfigKeys.SHOW_WINDOW_IN_CENTER, false)
+	}
+	
+	fun setShowWindowInCenter(selected: Boolean) {
+		ActionDesk.applyShowWindowInCenter(selected)
+		
+		if (getShowWindowInCenter() != selected) {
+			ConfigService.commit(ConfigKeys.SHOW_WINDOW_IN_CENTER, selected)
+		}
+	}
+	
+	/*
+	 * ActionDesk global hotkey
+	 * */
+	fun applyADHotKey(value: String) {
+		val action  = ActionDeskHKAction
+		action.globalKey = value
+		
+		ShortcutManager.registerOrUpdate(action.ID, action.globalKey, action::run)
+	}
+	
+	fun getADHotkey(): String {
+		return ConfigService.getString(ConfigKeys.ACTION_DESK_HOTKEY, "Alt+Back Quote")
+	}
+	
+	fun setADHotkey(value: String) {
+		val lastHotkey = getADHotkey()
+		
+		if (lastHotkey != value) {
+			applyADHotKey(value)
+		}
+		
+		ConfigService.commit(ConfigKeys.ACTION_DESK_HOTKEY, value)
+	}
+	
+	fun setPSBin(value: String) {
+		ConfigService.commit(ConfigKeys.PS_BIN, value)
+	}
+	
+	fun getPSBin(): String {
+		return ConfigService.getString(ConfigKeys.PS_BIN, "powershell")
 	}
 	
 }

@@ -1,23 +1,15 @@
 package net.abdulahad.action_desk.view
 
-import com.formdev.flatlaf.ui.FlatLineBorder
 import net.abdulahad.action_desk.data.Env
 import net.abdulahad.action_desk.helper.Icons.icon
 import net.abdulahad.action_desk.lib.util.Poth
-import java.awt.Color
 import java.awt.Dimension
 import java.awt.GridLayout
-import java.awt.Insets
 import java.awt.Window
 import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
 import java.io.File
-import javax.swing.BorderFactory
-import javax.swing.JDialog
-import javax.swing.JLabel
-import javax.swing.JPanel
-import javax.swing.JScrollPane
-import javax.swing.UIManager
+import javax.swing.*
 import javax.swing.border.EmptyBorder
 import javax.swing.border.MatteBorder
 
@@ -48,7 +40,7 @@ class IconGridPanel(
         
         scrollPane = JScrollPane(iconPanel)
         scrollPane.border = EmptyBorder(6, 6, 6, 6)
-        scrollPane.preferredSize = Dimension(320, 260)
+        scrollPane.preferredSize = Dimension(350, 300)
         scrollPane.verticalScrollBar.unitIncrement = 8
         
         scrollPane.verticalScrollBar.addAdjustmentListener { e ->
@@ -100,10 +92,10 @@ class IconGridPanel(
         for (i in loadedCount until end) {
             val name = iconNames[i]
             
-            val icon = name.icon(28)
+            val icon = name.icon(32)
             
             val label = JLabel(icon)
-            label.isOpaque = true
+            label.isOpaque = false
             label.horizontalAlignment = JLabel.CENTER
             label.verticalAlignment = JLabel.CENTER
             label.border = BorderFactory.createEmptyBorder(6, 6, 6, 6)

@@ -52,8 +52,6 @@ class ActionEntry : JPanel(), ListCellRenderer<Action> {
 		
 		titleLabel.setText(value.name)
 		
-		shortcutLabel.setText(value.hotkey)
-		
 		// Highlight
 		if (isSelected) {
 			setBackground(list.selectionBackground)

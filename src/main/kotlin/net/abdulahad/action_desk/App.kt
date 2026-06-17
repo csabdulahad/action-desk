@@ -1,19 +1,17 @@
 package net.abdulahad.action_desk
 
 import com.formdev.flatlaf.FlatLaf
-import com.formdev.flatlaf.icons.FlatWindowCloseIcon
-import com.formdev.flatlaf.icons.FlatWindowIconifyIcon
 import com.formdev.flatlaf.util.UIScale
 import net.abdulahad.action_desk.config.ConfigKeys
 import net.abdulahad.action_desk.config.ConfigService
 import net.abdulahad.action_desk.model.ThemeDescriptor
+import net.abdulahad.action_desk.view.ActionDesk
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.awt.Font
 import java.awt.Frame
 import java.io.InputStream
 import javax.swing.JFrame
-import javax.swing.SwingUtilities
 import javax.swing.UIManager
 import javax.swing.plaf.FontUIResource
 import kotlin.system.exitProcess
@@ -90,20 +88,30 @@ object App {
 		return null
 	}
 	
+	fun setMessage(text: String, animate: Boolean = true) {
+		ActionDesk.setMessage(text, animate)
+	}
+	
+	fun isShown(): Boolean {
+		return ActionDesk.isShowing
+	}
+	
 	fun listenThemeChange(callback: () -> Unit) {
 		UIManager.addPropertyChangeListener { evt ->
 			if (evt.propertyName == "lookAndFeel") {
-				SwingUtilities.invokeLater(callback)
+				onSwing(callback)
 			}
 		}
 	}
 	
-	fun applyCloseIcon() {
-		UIManager.put("TitlePane.closeIcon", FlatWindowCloseIcon())
-	}
-	
-	fun applyIconifyIcon() {
-		UIManager.put("TitlePane.closeIcon", FlatWindowIconifyIcon())
+	fun applyThemedUI(callback: () -> Unit) {
+		callback()
+		
+		UIManager.addPropertyChangeListener { evt ->
+			if (evt.propertyName == "lookAndFeel") {
+				onSwing(callback)
+			}
+		}
 	}
 	
 	private fun loadFont(size: Float): Font {
@@ -160,10 +168,6 @@ object App {
 			logErr(msg)
 			runtimeException(msg)
 		}
-	}
-	
-	fun getPSBin(): String {
-		return ConfigService.getString(ConfigKeys.COMMAND_LINE, "powershell")
 	}
 	
 	fun getSearchFocus(): Boolean {

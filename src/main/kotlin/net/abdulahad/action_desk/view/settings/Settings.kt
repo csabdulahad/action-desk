@@ -2,8 +2,10 @@ package net.abdulahad.action_desk.view.settings
 
 import net.abdulahad.action_desk.config.ConfigService
 import net.abdulahad.action_desk.helper.Icons.icon
+import net.abdulahad.action_desk.helper.Icons.toImageIcon
 import net.abdulahad.action_desk.helper.ViewHelper
 import net.abdulahad.action_desk.view.ActionDesk
+import net.abdulahad.action_desk.view.settings.panel.WindowPanel
 import net.abdulahad.action_desk.view.settings.panel.GeneralPanel
 import net.abdulahad.action_desk.view.settings.panel.StartupPanel
 import java.awt.*
@@ -12,7 +14,7 @@ import javax.swing.border.MatteBorder
 
 class Settings() : JDialog(ActionDesk) {
 	
-	private val listItems = listOf("General", "Startup")
+	private val listItems = listOf("General", "Startup", "Window")
 	private lateinit var rightPanel: JPanel
 	private lateinit var leftScrollPane: JScrollPane
 	
@@ -21,6 +23,7 @@ class Settings() : JDialog(ActionDesk) {
 
 	private lateinit var generalPanel: GeneralPanel
 	private lateinit var startupPanel: StartupPanel
+	private lateinit var windowPanel: WindowPanel
 	
 	val panels = mutableMapOf<String, JPanel>()
 	
@@ -57,21 +60,22 @@ class Settings() : JDialog(ActionDesk) {
 		isResizable = false
 		layout = BorderLayout()
 		
-		val icon = "actionDesk".icon(32)
+		val icon = "actionDesk".icon(32).toImageIcon()
 		setIconImage(icon.image)
 	}
 	
 	private fun initPanels() {
 		generalPanel = GeneralPanel(this)
 		startupPanel = StartupPanel(this)
+		windowPanel = WindowPanel(this)
 	}
 	
 	private fun setupRightPanel() {
 		rightPanel = JPanel(cardLayout)
 		
-		
-		panels["General"] = generalPanel
-		panels["Startup"] = startupPanel
+		panels["General"] 	 = generalPanel
+		panels["Startup"] 	 = startupPanel
+		panels["Window"] = windowPanel
 		
 		panels.forEach { (key, panel) ->
 			(panel as SettingsPanel).initUI()
@@ -91,6 +95,7 @@ class Settings() : JDialog(ActionDesk) {
 	
 	private fun setupLeftList() {
 		jList.setListData(listItems.toTypedArray())
+		
 		jList.isOpaque = true
 		jList.selectionMode = ListSelectionModel.SINGLE_SELECTION
 		jList.selectedIndex = 0

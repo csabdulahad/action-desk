@@ -22,17 +22,18 @@ data class Action (
 	
 	var showWindow: Boolean = false,
 	var windowStyle: String = "Normal",
+	var bringWindow: Boolean = false,
 	var keepWindowOpen: Boolean = false,
 	
-	var hotkey: String = "",
 	var globalKey: String = "",
-	
 	
 	var usePIDLock: Boolean = true,
 	
 	var logPath: String = "",
 	var pidLockPath: String = ""
 ) {
+	
+	var byShortcut: Boolean = false
 	
 	companion object {
 		fun Action.pidLockFile(): String {
@@ -80,7 +81,7 @@ data class Action (
 			
 			appendLine("showWindow = $showWindow, windowStyle = $windowStyle, keepWindowOpen = $keepWindowOpen")
 			
-			appendLine("hotkey = $hotkey, globalKey = $globalKey")
+			appendLine("globalKey = $globalKey")
 		}
 	}
 

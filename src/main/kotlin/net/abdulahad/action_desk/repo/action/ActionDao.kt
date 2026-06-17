@@ -1,7 +1,7 @@
-package net.abdulahad.action_desk.dao
+package net.abdulahad.action_desk.repo.action
 
 import net.abdulahad.action_desk.data.DB
-import net.abdulahad.action_desk.jooq.tables.Action.ACTION
+import net.abdulahad.action_desk.jooq.Tables.ACTION
 import net.abdulahad.action_desk.model.Action
 import java.time.LocalDateTime
 
@@ -28,10 +28,10 @@ object ActionDao {
 			singleton = record.singleton == 1,
 			startWithAD = record.startWithAd == 1,
 			
-			showWindow = record.showWindow == 1,
+			showWindow  = record.showWindow == 1,
 			windowStyle = record.windowStyle,
+			bringWindow = record.bringWindow == 1,
 			
-			hotkey = record.hotKey ?: "",
 			globalKey = record.globalKey ?: ""
 		)
 	}
@@ -43,9 +43,9 @@ object ActionDao {
 			
 			ACTION.RUN_AS_ADMIN, ACTION.SINGLETON, ACTION.START_WITH_AD,
 			
-			ACTION.SHOW_WINDOW, ACTION.WINDOW_STYLE,
+			ACTION.SHOW_WINDOW, ACTION.WINDOW_STYLE, ACTION.BRING_WINDOW,
 			
-			ACTION.HOT_KEY, ACTION.GLOBAL_KEY
+			ACTION.GLOBAL_KEY
 		)
 		.from(ACTION)
 		.where(ACTION.START_WITH_AD.eq(1), ACTION.ENABLED.eq(1))
@@ -68,15 +68,15 @@ object ActionDao {
 				
 				showWindow = record.get(ACTION.SHOW_WINDOW) == 1,
 				windowStyle = record.get(ACTION.WINDOW_STYLE),
+				bringWindow = record.get(ACTION.BRING_WINDOW) == 1,
 				
-				hotkey = record.get(ACTION.HOT_KEY),
 				globalKey = record.get(ACTION.GLOBAL_KEY),
 			)
 		}
 	}
 	
-	fun insert(action: Action) {
-		DB.DSL.insertInto(ACTION)
+	fun insert(action: Action): Int {
+		val result = DB.DSL.insertInto(ACTION)
 		.set(ACTION.ICON, action.icon)
 		.set(ACTION.NAME, action.name)
 		.set(ACTION.DESCRIPTION, action.description)
@@ -92,15 +92,18 @@ object ActionDao {
 		
 		.set(ACTION.SHOW_WINDOW, if (action.showWindow) 1 else 0)
 		.set(ACTION.WINDOW_STYLE, action.windowStyle)
+		.set(ACTION.BRING_WINDOW, if (action.bringWindow) 1 else 0)
 		
-		.set(ACTION.HOT_KEY, action.hotkey)
 		.set(ACTION.GLOBAL_KEY, action.globalKey)
 		
 		.set(ACTION.CREATED, LocalDateTime.now().toString())
-		.execute()
+		.returning(ACTION.ID)
+		.fetchOne()
+		
+		return result?.get(ACTION.ID) ?: -1
 	}
 	
-	fun update(action: Action) {
+	fun update(action: Action): Int {
 		DB.DSL.update(ACTION)
 		.set(ACTION.ICON, action.icon)
 		.set(ACTION.NAME, action.name)
@@ -117,19 +120,21 @@ object ActionDao {
 		
 		.set(ACTION.SHOW_WINDOW, if (action.showWindow) 1 else 0)
 		.set(ACTION.WINDOW_STYLE, action.windowStyle)
+		.set(ACTION.BRING_WINDOW, if (action.bringWindow) 1 else 0)
 		
-		.set(ACTION.HOT_KEY, action.hotkey)
 		.set(ACTION.GLOBAL_KEY, action.globalKey)
 		
 		.where(ACTION.ID.eq(action.id))
 		.execute()
+		
+		return action.id
 	}
 	
-	fun save(action: Action) {
+	fun save(action: Action ): Int {
 		if (action.id == 0) {
-			insert(action)
+			return insert(action)
 		} else {
-			update(action)
+			return update(action)
 		}
 	}
 	
@@ -147,9 +152,9 @@ object ActionDao {
 			
 			ACTION.RUN_AS_ADMIN, ACTION.SINGLETON, ACTION.START_WITH_AD,
 			
-			ACTION.SHOW_WINDOW, ACTION.WINDOW_STYLE,
+			ACTION.SHOW_WINDOW, ACTION.WINDOW_STYLE, ACTION.BRING_WINDOW,
 			
-			ACTION.HOT_KEY, ACTION.GLOBAL_KEY
+			ACTION.GLOBAL_KEY
 		).from(ACTION)
 		
 		// Conditionally filter by IDs
@@ -176,21 +181,19 @@ object ActionDao {
 					
 					showWindow = record.get(ACTION.SHOW_WINDOW) == 1,
 					windowStyle = record.get(ACTION.WINDOW_STYLE),
+					bringWindow = record.get(ACTION.BRING_WINDOW) == 1,
 					
-					hotkey = record.get(ACTION.HOT_KEY),
 					globalKey = record.get(ACTION.GLOBAL_KEY),
 				)
 			}
 	}
 	
-	fun listKeys(type: String? = null): List<String> {
-		val col = if (type == "hotkey") ACTION.HOT_KEY else ACTION.GLOBAL_KEY
-		
+	fun listKeys(): List<String> {
 		return DB.DSL
-			.select(col)
+			.select(ACTION.GLOBAL_KEY)
 			.from(ACTION)
 			.fetch { rec ->
-				rec.get(col)
+				rec.get(ACTION.GLOBAL_KEY)
 			}
 	}
 	

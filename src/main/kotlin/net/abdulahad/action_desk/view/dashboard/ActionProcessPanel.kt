@@ -5,8 +5,8 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import net.abdulahad.action_desk.App
-import net.abdulahad.action_desk.dao.ActionDao
-import net.abdulahad.action_desk.engine.ActionManager
+import net.abdulahad.action_desk.repo.action.ActionDao
+import net.abdulahad.action_desk.engine.action.ActionManager
 import net.abdulahad.action_desk.helper.Icons
 import net.abdulahad.action_desk.helper.Icons.icon
 import net.abdulahad.action_desk.helper.ProcessHelper

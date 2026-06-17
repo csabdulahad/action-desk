@@ -1,6 +1,7 @@
-package net.abdulahad.action_desk.engine.executor
+package net.abdulahad.action_desk.engine.action.executor
 
 import net.abdulahad.action_desk.App
+import net.abdulahad.action_desk.config.AppConfig
 import net.abdulahad.action_desk.model.Action
 import net.abdulahad.action_desk.model.Action.Companion.newLogFilePath
 import net.abdulahad.action_desk.model.Action.Companion.windowHidden
@@ -8,8 +9,6 @@ import java.io.File
 import java.util.concurrent.TimeUnit
 
 object ActionExecutor {
-	
-	val psBin: String = App.getPSBin()
 	
 	fun buildCommand(action: Action): List<String> {
 		val powershellCmd = mutableListOf(
@@ -81,7 +80,7 @@ object ActionExecutor {
 		
 		cmd = "$adminPrefix * ($cmd).Id | Out-File '${action.pidLockPath}' -Encoding utf8"
 		
-		return listOf(psBin, "-Command", cmd)
+		return listOf(AppConfig.getPSBin(), "-Command", cmd)
 	}
 	
 	fun execute(

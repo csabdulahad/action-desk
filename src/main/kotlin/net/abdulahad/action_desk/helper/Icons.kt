@@ -1,11 +1,13 @@
 package net.abdulahad.action_desk.helper
 
 import com.formdev.flatlaf.extras.FlatSVGIcon
-import com.formdev.flatlaf.extras.FlatSVGUtils
 import net.abdulahad.action_desk.data.Env
 import net.abdulahad.action_desk.lib.util.Poth
-import java.awt.Image
+import java.awt.*
+import java.awt.image.BufferedImage
 import java.io.File
+import javax.imageio.ImageIO
+import javax.swing.Icon
 import javax.swing.ImageIcon
 
 object Icons {
@@ -56,8 +58,10 @@ object Icons {
 	const val FOLDER = "folder"
 	const val FRAMEWORK = "framework"
 	const val GRID = "grid"
+	const val GROUPS = "groups"
 	const val HISTORY = "history"
 	const val HOME_FOLDER = "homeFolder"
+	const val ID = "id"
 	const val INFO = "info"
 	const val INFO_OUTLINE = "infoOutline"
 	const val INSPECTIONS_OK = "inspectionsOK"
@@ -71,6 +75,7 @@ object Icons {
 	const val LEARN = "learn"
 	const val LIBRARY = "library"
 	const val LIGHT_THEME = "lightTheme"
+	const val LIGHTNING = "lightning"
 	const val LOCATION = "location"
 	const val LOCKED = "locked"
 	const val MAGIC_RESOLVE_TOOLBAR = "magicResolveToolbar"
@@ -78,6 +83,7 @@ object Icons {
 	const val MONGO_FIELD = "mongoField"
 	const val MORE_HORIZONTAL = "moreHorizontal"
 	const val MORE_VERTICAL = "moreVertical"
+	const val NOTIFICATIONS = "notifications"
 	const val OPEN = "open"
 	const val OPEN_IN_NEW_WINDOW = "openInNewWindow"
 	const val PASTE = "paste"
@@ -96,15 +102,22 @@ object Icons {
 	const val REPORT = "report"
 	const val RESET = "reset"
 	const val RUN = "run"
+	const val RUN2 = "run2"
 	const val SAVE = "save"
 	const val SEARCH = "search"
 	const val SEPARATOR_HORIZONTAL = "separatorHorizontal"
 	const val SERVER = "server"
+	const val SERVICES = "services"
 	const val SETTINGS = "settings"
+	const val SHIELD = "shield"
 	const val SHOW_IGNORED = "showIgnored"
 	const val SHOW_PASSED = "showPassed"
+	const val SINGLE_STOPPED_CONTAINER = "singleStoppedContainer"
 	const val SPARK = "spark"
 	const val STRUCTURE = "structure"
+	const val SUBSCRIPTION = "subscription"
+	const val SUCCESS = "success"
+	const val SYSTEM_THEME = "systemTheme"
 	const val TARGET = "target"
 	const val TEST_CUSTOM = "testCustom"
 	const val TEST_UNKNOWN = "testUnknown"
@@ -119,6 +132,8 @@ object Icons {
 	const val VOLUME = "volume"
 	const val WARNING_INTRODUCTION = "warningIntroduction"
 	const val WATCH = "watch"
+	const val WARN = "warn"
+	const val WINDOWS = "microsoftWindows"
 	const val WEB = "web"
 	const val XHTML = "xhtml"
 	const val XML = "xml"
@@ -128,7 +143,7 @@ object Icons {
 		return ImageIcon(scaledImage)
 	}
 	
-	fun String.icon(size: Int = 20): ImageIcon {
+	fun String.icon(size: Int = 20): Icon {
 		// #1 svg - resource
 		val svgResource = "icons/svg/$this.svg"
 		if (Poth.resourceExists(svgResource)) {
@@ -145,18 +160,55 @@ object Icons {
 		// #3 svg - app folder
 		val customSVG = "${Env.APP_FOLDER}/icons/$this.svg"
 		if (Poth.fileExists(customSVG)) {
-			val bufferedImage = FlatSVGUtils.svg2image(File(customSVG).toURI().toURL(), size, size)
-			return ImageIcon(bufferedImage)
+			val icon = FlatSVGIcon(File(customSVG).toURI().toURL())
+			val base = icon.iconWidth.toFloat() // intrinsic size
+			
+			return icon.derive(size / base)
 		}
 		
 		// #4 png - app folder
 		val customPNG = "${Env.APP_FOLDER}/icons/$this.png"
 		if (Poth.fileExists(customPNG)) {
-			val icon = ImageIcon(File(customPNG).absolutePath)
-			return resizeIcon(icon, size, size)
+			val img = ImageIO.read(File(customPNG))
+			return HiDpiPngIcon(img, size)
 		}
 		
 		return FlatSVGIcon("icons/svg/empty.svg", size, size)
+	}
+	
+	class HiDpiPngIcon(
+		private val image: BufferedImage,
+		private val size: Int
+	) : Icon {
+		
+		override fun getIconWidth() = size
+		override fun getIconHeight() = size
+		
+		override fun paintIcon(c: Component?, g: Graphics, x: Int, y: Int) {
+			val g2 = g.create() as Graphics2D
+			
+			g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC)
+			g2.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY)
+			g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON)
+			
+			g2.drawImage(image, x, y, size, size, null)
+			g2.dispose()
+		}
+	}
+	
+	fun Icon.toImageIcon(): ImageIcon {
+		return when (this) {
+			is ImageIcon -> this
+			else -> {
+				val w = iconWidth
+				val h = iconHeight
+				val img = BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB)
+				val g = img.createGraphics()
+				paintIcon(null, g, 0, 0)
+				g.dispose()
+				ImageIcon(img)
+			}
+		}
 	}
 	
 }

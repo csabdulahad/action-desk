@@ -208,6 +208,14 @@ object ActionDesk : JDialog(), NotificationListener {
 				}
 			}
 			
+			val adcdSpec  = JMenuItem("ADCD Spec").apply {
+				icon = Icons.LEARN.icon()
+				
+				addActionListener {
+					CommonActions.openAdcdSpec()
+				}
+			}
+			
 			val about  = JMenuItem("About")
 			about.addActionListener {
 				About(ActionDesk)
@@ -227,6 +235,7 @@ object ActionDesk : JDialog(), NotificationListener {
 			}
 			
 			add(settings)
+			add(adcdSpec)
 			add(logFolder)
 			add(marketPlace)
 			add(about)
@@ -315,7 +324,7 @@ object ActionDesk : JDialog(), NotificationListener {
 			icon = instanceIcon
 			
 			/*
-			 * Handle Tab event on instance buton to focus back to search field
+			 * Handle Tab event on instance button to focus back to search field
 			 * */
 			
 			// Remove TAB from the Forward Traversal list

@@ -86,6 +86,7 @@ object Bootstrap {
 				StartupJobs.validateADAutoStartLink()
 				StartupJobs.runAutoStartActions()
 				StartupJobs.installTray()
+				StartupJobs.startAdcd()
 			}
 			
 			

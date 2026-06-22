@@ -3,6 +3,7 @@ package net.abdulahad.action_desk.config
 import com.formdev.flatlaf.FlatLaf
 import net.abdulahad.action_desk.data.AppValues
 import net.abdulahad.action_desk.engine.action.ActionRunner
+import net.abdulahad.action_desk.engine.adcd.AdcdDaemon
 import net.abdulahad.action_desk.engine.shortcut.ActionDeskHKAction
 import net.abdulahad.action_desk.engine.shortcut.ShortcutManager
 import net.abdulahad.action_desk.helper.CommonActions
@@ -15,6 +16,11 @@ import java.io.File
 import javax.swing.SwingUtilities
 
 object AppConfig {
+	
+	const val DEFAULT_ADCD_PORT = 4788
+	const val DEFAULT_ADCD_HOST_LOCAL = "127.0.0.1"
+	const val DEFAULT_ADCD_HOST_NETWORK = "0.0.0.0"
+	
 	/*
 	 * Auto run
 	 * */
@@ -209,6 +215,75 @@ object AppConfig {
 	
 	fun getPSBin(): String {
 		return ConfigService.getString(ConfigKeys.PS_BIN, "powershell")
+	}
+	
+	
+	/*
+	 * ADCD
+	 * */
+	fun applyAdcd() {
+		if (getAdcdEnabled()) {
+			AdcdDaemon.start(getAdcdHost(), getAdcdPort())
+		} else {
+			AdcdDaemon.stop()
+		}
+	}
+	
+	fun getAdcdEnabled(): Boolean {
+		return ConfigService.getBool(ConfigKeys.ADCD_ENABLED, true)
+	}
+	
+	fun setAdcdEnabled(enable: Boolean, apply: Boolean = false) {
+		val current = getAdcdEnabled()
+		
+		ConfigService.commit(ConfigKeys.ADCD_ENABLED, enable)
+		
+		if (apply && current != enable) {
+			applyAdcd()
+		}
+	}
+	
+	fun getAdcdAllowNetwork(): Boolean {
+		return ConfigService.getBool(ConfigKeys.ADCD_ALLOW_NETWORK, false)
+	}
+	
+	fun setAdcdAllowNetwork(enable: Boolean, apply: Boolean = false) {
+		val current = getAdcdAllowNetwork()
+		
+		ConfigService.commit(ConfigKeys.ADCD_ALLOW_NETWORK, enable)
+		
+		if (apply && current != enable) {
+			applyAdcd()
+		}
+	}
+	
+	fun getAdcdHost(): String {
+		return if (getAdcdAllowNetwork()) {
+			DEFAULT_ADCD_HOST_NETWORK
+		} else {
+			DEFAULT_ADCD_HOST_LOCAL
+		}
+	}
+	
+	fun getAdcdPort(): Int {
+		return try {
+			ConfigService
+				.getInt(ConfigKeys.ADCD_PORT, DEFAULT_ADCD_PORT)
+				.coerceIn(1024, 65535)
+		} catch (_: Exception) {
+			DEFAULT_ADCD_PORT
+		}
+	}
+	
+	fun setAdcdPort(port: Int, apply: Boolean = false) {
+		val cleanPort = port.coerceIn(1024, 65535)
+		val current = getAdcdPort()
+		
+		ConfigService.commit(ConfigKeys.ADCD_PORT, cleanPort)
+		
+		if (apply && current != cleanPort) {
+			applyAdcd()
+		}
 	}
 	
 }

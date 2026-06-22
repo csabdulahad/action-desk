@@ -1,24 +1,24 @@
 package net.abdulahad.action_desk.lib.json
 
 import com.fasterxml.jackson.core.type.TypeReference
-import com.fasterxml.jackson.databind.ObjectMapper
 import java.util.*
 
-
-class JsonObjectLoader(path: String) : JsonLoader<MutableMap<String, Any>> (path, object : TypeReference<MutableMap<String, Any>>() {}) {
-
-	companion object {
-		private val mapper = ObjectMapper()
-	}
+class JsonObjectLoader(path: String) : JsonLoader<MutableMap<String, Any>>(
+	path,
+	object : TypeReference<MutableMap<String, Any>>() {}
+) {
 	
 	private fun getNestedValue(key: String): Any? {
 		val map = get()
-		val parts: Array<String?> = key.split("\\.".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
+		val parts: Array<String?> = key
+			.split("\\.".toRegex())
+			.dropLastWhile { it.isEmpty() }
+			.toTypedArray()
 		
 		var current: Any? = map
 		
 		for (part in parts) {
-			if (current !is MutableMap<*, *>) return null
+			if (current !is Map<*, *>) return null
 			
 			current = current[part]
 			
@@ -29,23 +29,20 @@ class JsonObjectLoader(path: String) : JsonLoader<MutableMap<String, Any>> (path
 	}
 	
 	fun getString(key: String, defVal: String? = null): String? {
-		val value = getNestedValue(key)
-		return value as? String ?: (value?.toString() ?: defVal)
+		return path(key).string(defVal)
 	}
 	
 	fun getInt(key: String, defVal: Int? = null): Int? {
-		val value = getNestedValue(key)
-		return value as? Int ?: defVal
+		return path(key).intOrNull() ?: defVal
 	}
 	
 	fun getDouble(key: String, defVal: Double? = null): Double? {
-		val value = getNestedValue(key)
-		return value as? Double ?: defVal
+		return path(key).doubleOrNull() ?: defVal
 	}
 	
 	fun getRawList(key: String): List<Any?>? {
 		val value = getNestedValue(key)
-		return value as? List<*>
+		return value as? List<Any?>
 	}
 	
 	fun getList(key: String, defVal: MutableList<String>? = null): MutableList<String>? {
@@ -53,8 +50,11 @@ class JsonObjectLoader(path: String) : JsonLoader<MutableMap<String, Any>> (path
 		
 		if (value is String) {
 			return mutableListOf(
-				*value.split("\\s*,\\s*".toRegex()).dropLastWhile { it.isEmpty() }
-				.toTypedArray())
+				*value
+					.split("\\s*,\\s*".toRegex())
+					.dropLastWhile { it.isEmpty() }
+					.toTypedArray()
+			)
 		}
 		
 		if (value is List<*>) {
@@ -81,7 +81,7 @@ class JsonObjectLoader(path: String) : JsonLoader<MutableMap<String, Any>> (path
 			
 			if (next !is MutableMap<*, *>) {
 				next = LinkedHashMap<String, Any>()
-				current.put(part, next)
+				current[part] = next
 			}
 			
 			current = next as MutableMap<String, Any>

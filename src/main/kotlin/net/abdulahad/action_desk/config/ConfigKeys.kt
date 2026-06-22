@@ -17,4 +17,8 @@ object ConfigKeys {
 	const val SHOW_WINDOW_IN_CENTER 	= "show_window_in_center"
 	const val ACTION_DESK_HOTKEY 		= "action_desk_hotkey"
 	
+	const val ADCD_ENABLED 				= "adcd_enabled"
+	const val ADCD_PORT 				= "adcd_port"
+	const val ADCD_ALLOW_NETWORK 		= "adcd_allow_network"
+	
 }

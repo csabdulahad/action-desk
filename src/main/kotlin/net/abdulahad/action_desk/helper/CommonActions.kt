@@ -8,6 +8,7 @@ import net.abdulahad.action_desk.engine.action.executor.PSExecutor
 import net.abdulahad.action_desk.lib.util.Alert
 import net.abdulahad.action_desk.model.PSAction
 import net.abdulahad.action_desk.view.ActionDesk
+import java.awt.Desktop
 import java.io.File
 
 object CommonActions {
@@ -142,6 +143,30 @@ object CommonActions {
 			ResourceHelper.copyFile(AppValues.ACTION_DESK_LNK, path)
 			App.logInfo("ActionDesk shortcut created at: $path")
 		}
+	}
+	
+	fun openAdcdSpec() {
+		val targetPath = "${Env.APP_FOLDER}/adcd_spec.pdf"
+		val targetFile = File(targetPath)
+		
+		if (!targetFile.exists()) {
+			val copied = ResourceHelper.copyResourceFile(
+				"config/adcd_spec.pdf",
+				targetPath
+			)
+			
+			if (!copied && !targetFile.exists()) {
+				App.logErr("Failed to copy ADCD JUI spec PDF to: $targetPath")
+				return
+			}
+		}
+		
+		if (!Desktop.isDesktopSupported()) {
+			App.logErr("Desktop API is not supported. Cannot open PDF: $targetPath")
+			return
+		}
+		
+		Desktop.getDesktop().open(targetFile)
 	}
 	
 }

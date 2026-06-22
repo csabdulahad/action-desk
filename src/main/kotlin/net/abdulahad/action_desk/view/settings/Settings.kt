@@ -7,14 +7,15 @@ import net.abdulahad.action_desk.helper.ViewHelper
 import net.abdulahad.action_desk.view.ActionDesk
 import net.abdulahad.action_desk.view.settings.panel.WindowPanel
 import net.abdulahad.action_desk.view.settings.panel.GeneralPanel
+import net.abdulahad.action_desk.view.settings.panel.AdcdPanel
 import net.abdulahad.action_desk.view.settings.panel.StartupPanel
 import java.awt.*
 import javax.swing.*
 import javax.swing.border.MatteBorder
 
-class Settings() : JDialog(ActionDesk) {
+class Settings : JDialog(ActionDesk) {
 	
-	private val listItems = listOf("General", "Startup", "Window")
+	private val listItems = listOf("General", "Startup", "Window", "ADCD")
 	private lateinit var rightPanel: JPanel
 	private lateinit var leftScrollPane: JScrollPane
 	
@@ -24,6 +25,7 @@ class Settings() : JDialog(ActionDesk) {
 	private lateinit var generalPanel: GeneralPanel
 	private lateinit var startupPanel: StartupPanel
 	private lateinit var windowPanel: WindowPanel
+	private lateinit var adcdPanel: AdcdPanel
 	
 	val panels = mutableMapOf<String, JPanel>()
 	
@@ -68,6 +70,7 @@ class Settings() : JDialog(ActionDesk) {
 		generalPanel = GeneralPanel(this)
 		startupPanel = StartupPanel(this)
 		windowPanel = WindowPanel(this)
+		adcdPanel = AdcdPanel(this)
 	}
 	
 	private fun setupRightPanel() {
@@ -75,7 +78,8 @@ class Settings() : JDialog(ActionDesk) {
 		
 		panels["General"] 	 = generalPanel
 		panels["Startup"] 	 = startupPanel
-		panels["Window"] = windowPanel
+		panels["Window"] 	 = windowPanel
+		panels["ADCD"] 		 = adcdPanel
 		
 		panels.forEach { (key, panel) ->
 			(panel as SettingsPanel).initUI()

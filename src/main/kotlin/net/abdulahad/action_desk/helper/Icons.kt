@@ -12,6 +12,8 @@ import javax.swing.ImageIcon
 
 object Icons {
 	
+	private val JUI_ICON_EXTENSIONS = setOf("svg", "png", "jpg", "jpeg")
+	
 	const val ACTION_DESK = "actionDesk"
 	const val ADD = "add"
 	const val ANY_TYPE = "anyType"
@@ -176,6 +178,38 @@ object Icons {
 		return FlatSVGIcon("icons/svg/empty.svg", size, size)
 	}
 	
+	class ContainedIcon(
+		private val icon: Icon,
+		private val width: Int,
+		private val height: Int
+	) : Icon {
+		
+		override fun getIconWidth() = width
+		override fun getIconHeight() = height
+		
+		override fun paintIcon(c: Component?, g: Graphics, x: Int, y: Int) {
+			val sourceWidth = icon.iconWidth.takeIf { it > 0 } ?: width
+			val sourceHeight = icon.iconHeight.takeIf { it > 0 } ?: height
+			val scale = minOf(
+				width.toDouble() / sourceWidth.toDouble(),
+				height.toDouble() / sourceHeight.toDouble()
+			)
+			val drawWidth = (sourceWidth * scale).toInt().coerceAtLeast(1)
+			val drawHeight = (sourceHeight * scale).toInt().coerceAtLeast(1)
+			val drawX = x + ((width - drawWidth) / 2)
+			val drawY = y + ((height - drawHeight) / 2)
+			val g2 = g.create() as Graphics2D
+			
+			g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC)
+			g2.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY)
+			g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON)
+			g2.translate(drawX, drawY)
+			g2.scale(scale, scale)
+			icon.paintIcon(c, g2, 0, 0)
+			g2.dispose()
+		}
+	}
+	
 	class HiDpiPngIcon(
 		private val image: BufferedImage,
 		private val size: Int
@@ -209,6 +243,271 @@ object Icons {
 				ImageIcon(img)
 			}
 		}
+	}
+	
+	fun String.dialogIcon(size: Int = 32): Icon? {
+		val ref = trim()
+		
+		if (ref.isBlank()) {
+			return null
+		}
+		
+		val file = File(ref)
+		
+		/*
+		 * Absolute path:
+		 * Use exactly what caller provided.
+		 */
+		if (file.isAbsolute) {
+			return loadJuiIconFile(file, size)
+		}
+		
+		val cleanRef = ref
+			.replace("\\", "/")
+			.trimStart('/')
+		
+		/*
+		 * Relative path with extension:
+		 * First try app-folder icons.
+		 * Then try bundled resources.
+		 *
+		 * Examples:
+		 *   "custom/ex.svg"
+		 *   "ex.svg"
+		 *   "icons/svg/run.svg"
+		 */
+		if (hasJuiIconExtension(cleanRef)) {
+			loadJuiIconFile(File("${Env.APP_FOLDER}/icons/$cleanRef"), size)?.let {
+				return it
+			}
+			
+			loadJuiResourceIcon(cleanRef, size)?.let {
+				return it
+			}
+			
+			loadJuiResourceIcon("icons/$cleanRef", size)?.let {
+				return it
+			}
+			
+			return null
+		}
+		
+		/*
+		 * Plain icon name:
+		 * Reuse existing Action Desk icon resolver.
+		 *
+		 * Examples:
+		 *   "run"
+		 *   "settings"
+		 *   "server"
+		 */
+		return icon(size)
+	}
+	
+	fun String.dialogImageIcon(width: Int = 64, height: Int = 64): Icon? {
+		val ref = trim()
+		
+		if (ref.isBlank()) {
+			return null
+		}
+		
+		val safeWidth = width.coerceAtLeast(1)
+		val safeHeight = height.coerceAtLeast(1)
+		val file = File(ref)
+		
+		/*
+		 * Absolute path:
+		 * Use exactly what caller provided.
+		 */
+		if (file.isAbsolute) {
+			return loadJuiImageFile(file, safeWidth, safeHeight)
+		}
+		
+		val cleanRef = ref
+			.replace("\\", "/")
+			.trimStart('/')
+		
+		/*
+		 * Relative path with extension:
+		 * First try app-folder icons.
+		 * Then try bundled resources.
+		 */
+		if (hasJuiIconExtension(cleanRef)) {
+			loadJuiImageFile(File("${Env.APP_FOLDER}/icons/$cleanRef"), safeWidth, safeHeight)?.let {
+				return it
+			}
+			
+			loadJuiResourceImage(cleanRef, safeWidth, safeHeight)?.let {
+				return it
+			}
+			
+			loadJuiResourceImage("icons/$cleanRef", safeWidth, safeHeight)?.let {
+				return it
+			}
+			
+			return null
+		}
+		
+		/*
+		 * Plain image/icon name:
+		 * Try the app icons folder and bundled icons using the same name-without-
+		 * extension idea as JUI icon support, but include jpg/jpeg too.
+		 */
+		JUI_ICON_EXTENSIONS.forEach { ext ->
+			loadJuiImageFile(File("${Env.APP_FOLDER}/icons/$cleanRef.$ext"), safeWidth, safeHeight)?.let {
+				return it
+			}
+		}
+		
+		loadJuiResourceImage("icons/svg/$cleanRef.svg", safeWidth, safeHeight)?.let {
+			return it
+		}
+		
+		loadJuiResourceImage("icons/png/$cleanRef.png", safeWidth, safeHeight)?.let {
+			return it
+		}
+		
+		JUI_ICON_EXTENSIONS.forEach { ext ->
+			loadJuiResourceImage("icons/$cleanRef.$ext", safeWidth, safeHeight)?.let {
+				return it
+			}
+		}
+		
+		return null
+	}
+	
+	private fun loadJuiIconFile(file: File, size: Int): Icon? {
+		if (!file.exists() || !file.isFile) {
+			return null
+		}
+		
+		val ext = file.extension.lowercase()
+		
+		if (ext !in JUI_ICON_EXTENSIONS) {
+			return null
+		}
+		
+		return try {
+			when (ext) {
+				"svg" -> {
+					val icon = FlatSVGIcon(file.toURI().toURL())
+					val base = icon.iconWidth
+						.takeIf { it > 0 }
+						?: size
+					
+					icon.derive(size.toFloat() / base.toFloat())
+				}
+				
+				else -> {
+					val image = ImageIO.read(file) ?: return null
+					HiDpiPngIcon(image, size)
+				}
+			}
+		} catch (_: Exception) {
+			null
+		}
+	}
+	
+	private fun loadJuiResourceIcon(resourcePath: String, size: Int): Icon? {
+		if (!Poth.resourceExists(resourcePath)) {
+			return null
+		}
+		
+		val ext = resourcePath
+			.substringAfterLast('.', "")
+			.lowercase()
+		
+		if (ext !in JUI_ICON_EXTENSIONS) {
+			return null
+		}
+		
+		return try {
+			when (ext) {
+				"svg" -> FlatSVGIcon(resourcePath, size, size)
+				
+				else -> {
+					val image = Poth.getAsStream(resourcePath)?.use {
+						ImageIO.read(it)
+					} ?: return null
+					
+					HiDpiPngIcon(image, size)
+				}
+			}
+		} catch (_: Exception) {
+			null
+		}
+	}
+	
+	private fun loadJuiImageFile(file: File, width: Int, height: Int): Icon? {
+		if (!file.exists() || !file.isFile) {
+			return null
+		}
+		
+		val ext = file.extension.lowercase()
+		
+		if (ext !in JUI_ICON_EXTENSIONS) {
+			return null
+		}
+		
+		return try {
+			when (ext) {
+				"svg" -> ContainedIcon(
+					FlatSVGIcon(file.toURI().toURL()),
+					width,
+					height
+				)
+				
+				else -> {
+					val image = ImageIO.read(file) ?: return null
+					ContainedIcon(ImageIcon(image), width, height)
+				}
+			}
+		} catch (_: Exception) {
+			null
+		}
+	}
+	
+	private fun loadJuiResourceImage(resourcePath: String, width: Int, height: Int): Icon? {
+		if (!Poth.resourceExists(resourcePath)) {
+			return null
+		}
+		
+		val ext = resourcePath
+			.substringAfterLast('.', "")
+			.lowercase()
+		
+		if (ext !in JUI_ICON_EXTENSIONS) {
+			return null
+		}
+		
+		return try {
+			when (ext) {
+				"svg" -> ContainedIcon(
+					FlatSVGIcon(Poth.getURL(resourcePath)),
+					width,
+					height
+				)
+				
+				else -> {
+					val image = Poth.getAsStream(resourcePath)?.use {
+						ImageIO.read(it)
+					} ?: return null
+					
+					ContainedIcon(ImageIcon(image), width, height)
+				}
+			}
+		} catch (_: Exception) {
+			null
+		}
+	}
+	
+	private fun hasJuiIconExtension(path: String): Boolean {
+		val ext = path
+			.substringAfterLast('/', path)
+			.substringAfterLast('.', "")
+			.lowercase()
+		
+		return ext in JUI_ICON_EXTENSIONS
 	}
 	
 }

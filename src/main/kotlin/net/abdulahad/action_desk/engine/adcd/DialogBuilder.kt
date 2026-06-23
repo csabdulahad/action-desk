@@ -15,6 +15,7 @@ import java.awt.Component
 import java.awt.Dialog
 import java.awt.Dimension
 import java.awt.Font
+import java.awt.Frame
 import java.awt.GridLayout
 import java.awt.Insets
 import java.awt.Rectangle
@@ -142,7 +143,7 @@ class DialogBuilder(
 			 * because JDialog does not hide FlatLaf's built-in title as reliably as
 			 * JFrame; our custom JLabel below is the visible title.
 			 */
-			JDialog(ActionDesk).apply {
+			JDialog(null as Frame?).apply {
 				title = ""
 				modalityType = Dialog.ModalityType.MODELESS
 				defaultCloseOperation = JDialog.DO_NOTHING_ON_CLOSE

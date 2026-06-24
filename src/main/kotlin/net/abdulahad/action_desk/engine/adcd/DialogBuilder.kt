@@ -458,6 +458,7 @@ class DialogBuilder(
 		}
 		
 		val label = JLabel(field.label).apply {
+			DialogFont.apply(this, field.label)
 			maximumSize = preferredSize
 		}
 		
@@ -529,6 +530,7 @@ class DialogBuilder(
 	private fun buildWrappingDisplayText(text: String, availableWidth: Int): JComponent {
 		val textArea = JTextArea(text).apply {
 			font = UIManager.getFont("Label.font")
+			DialogFont.apply(this, text)
 			foreground = UIManager.getColor("Label.foreground")
 			lineWrap = true
 			wrapStyleWord = true
@@ -614,6 +616,7 @@ class DialogBuilder(
 		
 		field.options.forEachIndexed { index, option ->
 			val radio = JRadioButton(option.label).apply {
+				DialogFont.apply(this, option.label)
 				isOpaque = false
 				
 				if (field.value != null && option.value == field.value) {
@@ -649,6 +652,8 @@ class DialogBuilder(
 			if (field.labelPosition != "none" && !field.label.isNullOrBlank()) {
 				text = field.label
 			}
+			
+			DialogFont.apply(this, field.label)
 		}
 	}
 	
@@ -673,6 +678,8 @@ class DialogBuilder(
 			component.putClientProperty("JTextField.placeholderText", placeholder)
 		}
 		
+		DialogFont.apply(component, field.value, placeholder, field.label)
+		
 		return component
 	}
 	
@@ -690,6 +697,7 @@ class DialogBuilder(
 	
 	private fun buildTextarea(field: DialogFieldSpec, availableWidth: Int): JComponent {
 		val textArea = JTextArea(field.value ?: "").apply {
+			DialogFont.apply(this, field.value, field.label, field.placeholder)
 			rows = 4
 			lineWrap = true
 			wrapStyleWord = true
@@ -705,6 +713,8 @@ class DialogBuilder(
 	
 	private fun buildSelectField(field: DialogFieldSpec, availableWidth: Int): JComponent {
 		return JComboBox(field.options.toTypedArray()).apply {
+			DialogFont.apply(this, *field.options.map { it.label }.toTypedArray())
+			
 			if (field.value != null) {
 				for (i in 0 until itemCount) {
 					val item = getItemAt(i)
@@ -998,7 +1008,11 @@ class DialogBuilder(
 	
 	private fun measureNaturalTextWidth(text: String): Int {
 		val label = JLabel()
-		label.font = UIManager.getFont("Label.font") ?: label.font
+		label.font = DialogFont.bestFontFor(
+			text,
+			UIManager.getFont("Label.font") ?: label.font
+		)
+		
 		val fontMetrics = label.getFontMetrics(label.font)
 		
 		return text
@@ -1136,6 +1150,7 @@ class DialogBuilder(
 			verticalAlignment = SwingConstants.CENTER
 			border = EmptyBorder(DIALOG_TITLE_TEXT_TOP_PADDING, 0, 0, 0)
 			font = UIManager.getFont("Label.font") ?: font
+			DialogFont.apply(this, spec.title)
 			foreground = UIManager.getColor("Label.foreground") ?: foreground
 			minimumSize = Dimension(0, DIALOG_TITLE_BAR_HEIGHT)
 			preferredSize = Dimension(0, DIALOG_TITLE_BAR_HEIGHT)
@@ -1260,6 +1275,7 @@ class DialogBuilder(
 		val button = JButton(buttonSpec.label)
 		
 		applyButtonStyle(button, buttonSpec)
+		DialogFont.apply(button, buttonSpec.label)
 		
 		button.addActionListener {
 			handleButton(buttonSpec)

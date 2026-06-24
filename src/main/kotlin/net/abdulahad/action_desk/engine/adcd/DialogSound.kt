@@ -1,6 +1,7 @@
 package net.abdulahad.action_desk.engine.adcd
 
 import net.abdulahad.action_desk.App
+import net.abdulahad.action_desk.config.AppConfig
 import net.abdulahad.action_desk.data.Env
 import net.abdulahad.action_desk.lib.util.Poth
 import java.io.BufferedInputStream
@@ -20,6 +21,10 @@ object DialogSound {
 		val src = sound?.src?.trim() ?: return
 		
 		if (src.lowercase() in noSoundValues) {
+			return
+		}
+		
+		if (AppConfig.getAdcdMuteSound()) {
 			return
 		}
 		

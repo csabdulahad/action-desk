@@ -117,7 +117,6 @@ class DialogBuilder(
 		
 		dialog.isVisible = true
 		DialogSound.play(spec.sound)
-		println(spec.sound)
 	}
 	
 	private fun createWindow(): Window {

@@ -49,6 +49,16 @@ object DialogJson {
 		)
 	}
 	
+	fun dialogDisabledToJson(): String {
+		return Json.stringify(
+			mapOf(
+				"status" to "dialog_disabled",
+				"button" to "disabled",
+				"values" to emptyMap<String, Any?>()
+			)
+		)
+	}
+	
 	private fun parseLayout(
 		node: JsonValue,
 		defaultValue: DialogLayoutSpec = DialogLayoutSpec()

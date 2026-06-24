@@ -286,4 +286,20 @@ object AppConfig {
 		}
 	}
 	
+	fun getAdcdMuteSound(): Boolean {
+		return ConfigService.getBool(ConfigKeys.ADCD_MUTE_SOUND, false)
+	}
+	
+	fun setAdcdMuteSound(enable: Boolean) {
+		ConfigService.commit(ConfigKeys.ADCD_MUTE_SOUND, enable)
+	}
+	
+	fun getAdcdDisableDialog(): Boolean {
+		return ConfigService.getBool(ConfigKeys.ADCD_DISABLE_DIALOG, false)
+	}
+	
+	fun setAdcdDisableDialog(enable: Boolean) {
+		ConfigService.commit(ConfigKeys.ADCD_DISABLE_DIALOG, enable)
+	}
+	
 }

@@ -25,6 +25,8 @@ class AdcdPanel(private val frame: Window): JPanel(), SettingsPanel {
 	private val adcdEnabledCheckbox = FlatCheckBox()
 	private val adcdPortField = FlatSpinner()
 	private val adcdAllowNetworkCheckbox = FlatCheckBox()
+	private val adcdMuteSoundCheckbox = FlatCheckBox()
+	private val adcdDisableDialogCheckbox = FlatCheckBox()
 	
 	init {
 		layout = VerticalLayout(8)
@@ -40,6 +42,12 @@ class AdcdPanel(private val frame: Window): JPanel(), SettingsPanel {
 		
 		adcdAllowNetworkCheckbox.text = "Allow network access"
 		adcdAllowNetworkCheckbox.toolTipText = "Allow devices on the same network to access ADCD using this computer's LAN IP."
+		
+		adcdMuteSoundCheckbox.text = "Mute ADCD sounds"
+		adcdMuteSoundCheckbox.toolTipText = "Ignore sound playback requested by ADCD dialog JSON."
+		
+		adcdDisableDialogCheckbox.text = "Disable ADCD dialogs"
+		adcdDisableDialogCheckbox.toolTipText = "Return a disabled response for ADCD dialog requests without showing a dialog."
 		
 		adcdPortField.apply {
 			model = SpinnerNumberModel(AppConfig.DEFAULT_ADCD_PORT, 1024, 65535, 1)
@@ -60,6 +68,8 @@ class AdcdPanel(private val frame: Window): JPanel(), SettingsPanel {
 		
 		add(adcdEnabledCheckbox.apply { border = EmptyBorder(5, 0, 0, 0) }, BorderLayout.EAST)
 		add(adcdAllowNetworkCheckbox)
+		add(adcdMuteSoundCheckbox)
+		add(adcdDisableDialogCheckbox)
 		
 		val portPanel = JPanel(VerticalLayout(4)).apply {
 			val label = JLabel("Port").apply {
@@ -88,6 +98,8 @@ class AdcdPanel(private val frame: Window): JPanel(), SettingsPanel {
 		
 		adcdPortField.isEnabled = enabled
 		adcdAllowNetworkCheckbox.isEnabled = enabled
+		adcdMuteSoundCheckbox.isEnabled = enabled
+		adcdDisableDialogCheckbox.isEnabled = enabled
 	}
 	
 	private fun selectAllOnSpinnerFocus(spinner: FlatSpinner) {
@@ -106,6 +118,8 @@ class AdcdPanel(private val frame: Window): JPanel(), SettingsPanel {
 	override fun initUI() {
 		adcdEnabledCheckbox.isSelected = AppConfig.getAdcdEnabled()
 		adcdAllowNetworkCheckbox.isSelected = AppConfig.getAdcdAllowNetwork()
+		adcdMuteSoundCheckbox.isSelected = AppConfig.getAdcdMuteSound()
+		adcdDisableDialogCheckbox.isSelected = AppConfig.getAdcdDisableDialog()
 		adcdPortField.value = AppConfig.getAdcdPort()
 		
 		syncEnabledState()
@@ -114,6 +128,8 @@ class AdcdPanel(private val frame: Window): JPanel(), SettingsPanel {
 	override fun saveConfig() {
 		AppConfig.setAdcdEnabled(adcdEnabledCheckbox.isSelected)
 		AppConfig.setAdcdAllowNetwork(adcdAllowNetworkCheckbox.isSelected)
+		AppConfig.setAdcdMuteSound(adcdMuteSoundCheckbox.isSelected)
+		AppConfig.setAdcdDisableDialog(adcdDisableDialogCheckbox.isSelected)
 		AppConfig.setAdcdPort((adcdPortField.value as Number).toInt())
 		
 		AppConfig.applyAdcd()

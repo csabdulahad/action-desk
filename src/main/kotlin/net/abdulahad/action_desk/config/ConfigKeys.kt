@@ -20,5 +20,7 @@ object ConfigKeys {
 	const val ADCD_ENABLED 				= "adcd_enabled"
 	const val ADCD_PORT 				= "adcd_port"
 	const val ADCD_ALLOW_NETWORK 		= "adcd_allow_network"
+	const val ADCD_MUTE_SOUND 			= "adcd_mute_sound"
+	const val ADCD_DISABLE_DIALOG 		= "adcd_disable_dialog"
 	
 }

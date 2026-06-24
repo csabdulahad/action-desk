@@ -3,6 +3,7 @@ package net.abdulahad.action_desk.engine.adcd
 import com.sun.net.httpserver.HttpExchange
 import com.sun.net.httpserver.HttpHandler
 import net.abdulahad.action_desk.App
+import net.abdulahad.action_desk.config.AppConfig
 import java.nio.charset.StandardCharsets
 
 class AdcdDialogHttpHandler : HttpHandler {
@@ -11,6 +12,13 @@ class AdcdDialogHttpHandler : HttpHandler {
 		try {
 			if (exchange.requestMethod.uppercase() != "POST") {
 				sendJson(exchange, 405, DialogJson.errorToJson("Method not allowed"))
+				return
+			}
+			
+			if (AppConfig.getAdcdDisableDialog()) {
+				App.logInfo("ADCD: /adcd/v1/dialog request ignored because dialogs are disabled")
+				exchange.requestBody.close()
+				sendJson(exchange, 200, DialogJson.dialogDisabledToJson())
 				return
 			}
 			

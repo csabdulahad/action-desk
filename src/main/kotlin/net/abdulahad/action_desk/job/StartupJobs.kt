@@ -5,6 +5,7 @@ import net.abdulahad.action_desk.config.AppConfig
 import net.abdulahad.action_desk.data.AppValues
 import net.abdulahad.action_desk.engine.action.ActionRunner
 import net.abdulahad.action_desk.engine.adcd.AdcdDaemon
+import net.abdulahad.action_desk.engine.schedule.ActionScheduleService
 import net.abdulahad.action_desk.lib.tray.TrayMan
 import net.abdulahad.action_desk.onIO
 import net.abdulahad.action_desk.repo.action.ActionDao
@@ -72,4 +73,8 @@ object StartupJobs {
 		AdcdDaemon.start(AppConfig.getAdcdHost(), AppConfig.getAdcdPort())
 	}
 	
+	fun startActionScheduler() {
+		ActionScheduleService.start()
+	}
+
 }

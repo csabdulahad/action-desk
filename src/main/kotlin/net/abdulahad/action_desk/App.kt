@@ -4,6 +4,7 @@ import com.formdev.flatlaf.FlatLaf
 import com.formdev.flatlaf.util.UIScale
 import net.abdulahad.action_desk.config.ConfigKeys
 import net.abdulahad.action_desk.config.ConfigService
+import net.abdulahad.action_desk.engine.schedule.ActionScheduleService
 import net.abdulahad.action_desk.model.ThemeDescriptor
 import net.abdulahad.action_desk.view.ActionDesk
 import org.slf4j.Logger
@@ -196,7 +197,7 @@ object App {
 	}
 	
 	fun onClose() {
-	
+		ActionScheduleService.stop()
 	}
 	
 }

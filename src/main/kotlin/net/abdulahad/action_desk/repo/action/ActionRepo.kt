@@ -39,7 +39,7 @@ object ActionRepo {
 		return findById(id)
 	}
 	
-	fun save(action: Action?) {
+	fun save(action: Action?, afterSaved: ((Action) -> Unit)? = null) {
 		if (action == null) return
 		
 		onIO {
@@ -61,8 +61,20 @@ object ActionRepo {
 				}
 			}
 			
+			val postSaveError = try {
+				afterSaved?.invoke(action)
+				null
+			} catch (e: Exception) {
+				App.logErr("Action ${action.name} saved, but post-save work failed: ${e.message}")
+				e
+			}
+			
 			onUI {
-				NotificationManager.success("Action ${action.name} saved")
+				if (postSaveError == null) {
+					NotificationManager.success("Action ${action.name} saved")
+				} else {
+					NotificationManager.error("Action ${action.name} saved, but schedule could not be saved")
+				}
 				listeners.forEach { l ->
 					if (updated) l.onActionUpdated(action) else l.onActionAdded(action)
 				}

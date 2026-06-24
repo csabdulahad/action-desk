@@ -87,6 +87,7 @@ object Bootstrap {
 				StartupJobs.runAutoStartActions()
 				StartupJobs.installTray()
 				StartupJobs.startAdcd()
+				StartupJobs.startActionScheduler()
 			}
 			
 			

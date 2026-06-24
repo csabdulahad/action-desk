@@ -11,7 +11,13 @@ import javax.swing.border.MatteBorder
 
 class ActionEditor(parentFrame: Window, private var action: Action? = null) : JDialog(parentFrame) {
 	
-	private val listItems = listOf("General", "Command", "Process", "Window")
+	companion object {
+		private const val LEFT_MENU_WIDTH = 120
+		private const val CONTENT_WIDTH   = 420
+		private const val CONTENT_HEIGHT  = 380
+	}
+	
+	private val listItems = listOf("General", "Command", "Process", "Window", "Schedule")
 	
 	private lateinit var rightPanel: JPanel
 	private lateinit var leftScrollPane: JScrollPane
@@ -25,6 +31,7 @@ class ActionEditor(parentFrame: Window, private var action: Action? = null) : JD
 	private lateinit var commandPanel: CommandPanel
 	private lateinit var processPanel: ProcessPanel
 	private lateinit var windowPanel: WindowPanel
+	private lateinit var schedulePanel: SchedulePanel
 	
 	private var updateCallback: (() -> Unit)? = null
 	
@@ -50,7 +57,7 @@ class ActionEditor(parentFrame: Window, private var action: Action? = null) : JD
 			rightPanel).apply {
 			putClientProperty("JSplitPane.style", "grip: none")
 			border = MatteBorder(Insets(1, 0, 0, 0), UIManager.getColor("Component.borderColor"))
-			dividerLocation = 120
+			dividerLocation = LEFT_MENU_WIDTH
 			isEnabled = false
 			dividerSize = 0
 		}
@@ -68,6 +75,7 @@ class ActionEditor(parentFrame: Window, private var action: Action? = null) : JD
 		commandPanel.setData(action!!)
 		processPanel.setData(action!!)
 		windowPanel.setData(action!!)
+		schedulePanel.setData(action!!)
 	}
 	
 	private fun initPanels() {
@@ -77,13 +85,14 @@ class ActionEditor(parentFrame: Window, private var action: Action? = null) : JD
 		commandPanel = CommandPanel()
 		processPanel = ProcessPanel()
 		windowPanel = WindowPanel()
+		schedulePanel = SchedulePanel()
 	}
 	
 	private fun setupDialog() {
 		title = "New Action"
 		modalityType = ModalityType.APPLICATION_MODAL
 		defaultCloseOperation = DO_NOTHING_ON_CLOSE
-		minimumSize = Dimension(375, 375)
+		minimumSize = Dimension(LEFT_MENU_WIDTH + CONTENT_WIDTH, CONTENT_HEIGHT)
 		isResizable = false
 		layout = BorderLayout()
 		
@@ -104,6 +113,7 @@ class ActionEditor(parentFrame: Window, private var action: Action? = null) : JD
 		
 		leftScrollPane = JScrollPane(jList).apply {
 			isOpaque = true
+			preferredSize = Dimension(LEFT_MENU_WIDTH, CONTENT_HEIGHT)
 			putClientProperty("JComponent.focusWidth", 0)
 			border = MatteBorder(Insets(0, 0, 0, 1), UIManager.getColor("Component.borderColor"))
 		}
@@ -116,13 +126,14 @@ class ActionEditor(parentFrame: Window, private var action: Action? = null) : JD
 			"General"   to generalPanel,
 			"Command"   to commandPanel,
 			"Process"   to processPanel,
-			"Window"   to windowPanel,
+			"Schedule"  to schedulePanel,
+			"Window"    to windowPanel,
 		).forEach { (key, panel) ->
 			val x = JScrollPane(panel)
 			x.verticalScrollBar.unitIncrement = 12
 			x.border = null
 			panel.border = BorderFactory.createEmptyBorder(12, 12, 12, 12)
-			x.preferredSize = Dimension(350, preferredSize.height)
+			x.preferredSize = Dimension(CONTENT_WIDTH, CONTENT_HEIGHT)
 			rightPanel.add(x, key)
 		}
 		
@@ -196,6 +207,7 @@ class ActionEditor(parentFrame: Window, private var action: Action? = null) : JD
 			commandPanel,
 			processPanel,
 			windowPanel,
+			schedulePanel,
 		)
 		
 		for (panel in panels) {
@@ -209,7 +221,9 @@ class ActionEditor(parentFrame: Window, private var action: Action? = null) : JD
 			return
 		}
 		
-		ActionRepo.save(action)
+		ActionRepo.save(action) { savedAction ->
+			schedulePanel.persistForAction(savedAction)
+		}
 		
 		if (updateCallback != null) updateCallback!!.invoke()
 		

@@ -52,7 +52,7 @@ object ActionRunner {
 		return@withContext null
 	}
 	
-	fun runAction(action: Action, diagnose: Boolean, bootupRun: Boolean = false) {
+	fun runAction(action: Action, diagnose: Boolean, bootupRun: Boolean = false, automaticRun: Boolean = bootupRun) {
 		val byShortcut = action.byShortcut
 		action.byShortcut = false
 		
@@ -86,9 +86,11 @@ object ActionRunner {
 			return
 		}
 		
+		val runnableAction = ActionRunGuard.prepareActionForRun(action, diagnose, automaticRun) ?: return
+		
 		if (!diagnose) {
-			App.setMessage("Last action: ${action.name}")
-			NotificationManager.info("Last action: ${action.name}", isSilent = !byShortcut)
+			App.setMessage("Last action: ${runnableAction.name}")
+			NotificationManager.info("Last action: ${runnableAction.name}", isSilent = !byShortcut)
 		}
 		
 		if (!bootupRun && hideAfterAction) {
@@ -101,7 +103,7 @@ object ActionRunner {
 				 * Get PID lock file, if exists with the hash combination
 				 * then keep calling until we get a unique one!
 				 * */
-				var path = ProcessHelper.generatePIDLockFileName(action.id)
+				var path = ProcessHelper.generatePIDLockFileName(runnableAction.id)
 				
 				while (true) {
 					val file = File(path)
@@ -111,40 +113,40 @@ object ActionRunner {
 						println(msg)
 						App.logWarn(msg)
 						
-						path = ProcessHelper.generatePIDLockFileName(action.id)
+						path = ProcessHelper.generatePIDLockFileName(runnableAction.id)
 						continue
 					}
 					
 					break
 				}
 				
-				action.pidLockPath = path
+				runnableAction.pidLockPath = path
 				
-				ActionExecutor.execute(action, diagnose)
+				ActionExecutor.execute(runnableAction, diagnose)
 				
 				val pid = grabPIDFromLockFile(path)
 				
-				ActionManager.registerActionPID(action.id, pid)
+				ActionManager.registerActionPID(runnableAction.id, pid)
 				
 				val msg = "PID by grabPID: $pid"
 				println(msg)
 				App.logInfo(msg)
 				
 			} catch (e: Exception) {
-				val msg = "${action.name}: ${e.message}"
+				val msg = "${runnableAction.name}: ${e.message}"
 				println(msg)
 				
 				if (diagnose) {
 					App.logTagged("DIAGNOSIS", msg)
 					
 					Files.writeString(
-						File(action.logPath).toPath(),
+						File(runnableAction.logPath).toPath(),
 						e.message + System.lineSeparator(),
 						StandardOpenOption.CREATE,
 						StandardOpenOption.APPEND
 					)
 					
-					CommonActions.openInNotepad(action.logPath)
+					CommonActions.openInNotepad(runnableAction.logPath)
 				} else {
 					App.logErr(msg)
 				}

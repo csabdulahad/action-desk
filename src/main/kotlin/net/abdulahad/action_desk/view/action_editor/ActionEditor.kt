@@ -1,23 +1,30 @@
 package net.abdulahad.action_desk.view.action_editor
 
+import net.abdulahad.action_desk.engine.security.ProtectedActionCrypto
+import net.abdulahad.action_desk.engine.security.SecurityService
 import net.abdulahad.action_desk.model.Action
 import net.abdulahad.action_desk.repo.action.ActionRepo
 import net.abdulahad.action_desk.view.action_editor.panel.*
+import net.abdulahad.action_desk.view.settings.dialog.SecurityPasswordDialog
 import java.awt.*
 import java.awt.event.WindowAdapter
 import java.awt.event.WindowEvent
 import javax.swing.*
 import javax.swing.border.MatteBorder
 
-class ActionEditor(parentFrame: Window, private var action: Action? = null) : JDialog(parentFrame) {
+class ActionEditor(
+	parentFrame: Window,
+	private var action: Action? = null,
+	unlockedPassword: String? = null
+) : JDialog(parentFrame) {
 	
 	companion object {
-		private const val LEFT_MENU_WIDTH = 120
+		private const val LEFT_MENU_WIDTH = 140
 		private const val CONTENT_WIDTH   = 420
 		private const val CONTENT_HEIGHT  = 380
 	}
 	
-	private val listItems = listOf("General", "Command", "Process", "Window", "Schedule")
+	private val listItems = listOf("General", "Command", "Process", "Safety & Security", "Window", "Schedule")
 	
 	private lateinit var rightPanel: JPanel
 	private lateinit var leftScrollPane: JScrollPane
@@ -30,10 +37,12 @@ class ActionEditor(parentFrame: Window, private var action: Action? = null) : JD
 	private lateinit var generalPanel: GeneralPanel
 	private lateinit var commandPanel: CommandPanel
 	private lateinit var processPanel: ProcessPanel
+	private lateinit var safetySecurityPanel: SafetySecurityPanel
 	private lateinit var windowPanel: WindowPanel
 	private lateinit var schedulePanel: SchedulePanel
 	
 	private var updateCallback: (() -> Unit)? = null
+	private var editSessionPassword: String? = unlockedPassword
 	
 	fun setUploadCallback(callback: () -> Unit) {
 		updateCallback = callback
@@ -74,6 +83,7 @@ class ActionEditor(parentFrame: Window, private var action: Action? = null) : JD
 		generalPanel.setData(action!!)
 		commandPanel.setData(action!!)
 		processPanel.setData(action!!)
+		safetySecurityPanel.setData(action!!)
 		windowPanel.setData(action!!)
 		schedulePanel.setData(action!!)
 	}
@@ -84,6 +94,7 @@ class ActionEditor(parentFrame: Window, private var action: Action? = null) : JD
 		
 		commandPanel = CommandPanel()
 		processPanel = ProcessPanel()
+		safetySecurityPanel = SafetySecurityPanel()
 		windowPanel = WindowPanel()
 		schedulePanel = SchedulePanel()
 	}
@@ -98,8 +109,7 @@ class ActionEditor(parentFrame: Window, private var action: Action? = null) : JD
 		
 		addWindowListener(object: WindowAdapter() {
 			override fun windowClosing(e: WindowEvent?) {
-				dispose()
-				this@ActionEditor.parent.isVisible = true
+				closeEditor()
 			}
 		})
 	}
@@ -123,11 +133,12 @@ class ActionEditor(parentFrame: Window, private var action: Action? = null) : JD
 		rightPanel = JPanel(cardLayout)
 		
 		mapOf (
-			"General"   to generalPanel,
-			"Command"   to commandPanel,
-			"Process"   to processPanel,
-			"Schedule"  to schedulePanel,
-			"Window"    to windowPanel,
+			"General"             to generalPanel,
+			"Command"             to commandPanel,
+			"Process"             to processPanel,
+			"Safety & Security"   to safetySecurityPanel,
+			"Schedule"            to schedulePanel,
+			"Window"              to windowPanel,
 		).forEach { (key, panel) ->
 			val x = JScrollPane(panel)
 			x.verticalScrollBar.unitIncrement = 12
@@ -150,8 +161,7 @@ class ActionEditor(parentFrame: Window, private var action: Action? = null) : JD
 		
 		val cancelButton = JButton("Cancel")
 		cancelButton.addActionListener {
-			dispose()
-			this@ActionEditor.parent.isVisible = true
+			closeEditor()
 		}
 		
 		val buttonPanel = JPanel(FlowLayout(FlowLayout.RIGHT))
@@ -206,6 +216,7 @@ class ActionEditor(parentFrame: Window, private var action: Action? = null) : JD
 			generalPanel,
 			commandPanel,
 			processPanel,
+			safetySecurityPanel,
 			windowPanel,
 			schedulePanel,
 		)
@@ -221,12 +232,68 @@ class ActionEditor(parentFrame: Window, private var action: Action? = null) : JD
 			return
 		}
 		
+		if (!prepareActionSecurityForSave(action!!)) {
+			return
+		}
+		
 		ActionRepo.save(action) { savedAction ->
 			schedulePanel.persistForAction(savedAction)
 		}
 		
 		if (updateCallback != null) updateCallback!!.invoke()
 		
+		closeEditor()
+	}
+	
+	private fun prepareActionSecurityForSave(action: Action): Boolean {
+		if (!action.passwordProtected) {
+			action.encryptedPayload = ""
+			return true
+		}
+		
+		if (!SecurityService.hasPassword()) {
+			selectLeftMenu("Safety & Security")
+			setFeedback("Set security password in Settings first")
+			return false
+		}
+		
+		val password = editSessionPassword ?: askPasswordForProtectedSave() ?: run {
+			selectLeftMenu("Safety & Security")
+			setFeedback("Password is required to protect this action")
+			return false
+		}
+		
+		return try {
+			ProtectedActionCrypto.encryptActionPayload(action, password)
+			true
+		} catch (e: Exception) {
+			selectLeftMenu("Safety & Security")
+			setFeedback(e.message ?: "Protected action could not be encrypted")
+			false
+		}
+	}
+	
+	private fun askPasswordForProtectedSave(): String? {
+		var password: String? = null
+		
+		val verified = SecurityPasswordDialog.showVerifiedPassword(
+			parent = this,
+			title = "Protect Action",
+			invalidPasswordMessage = "Password did not work.",
+			verifier = { input ->
+				val success = SecurityService.verifyPassword(input)
+				if (success) {
+					password = input
+				}
+				success
+			}
+		)
+		
+		return if (verified) password else null
+	}
+	
+	private fun closeEditor() {
+		editSessionPassword = null
 		dispose()
 		this@ActionEditor.parent.isVisible = true
 	}

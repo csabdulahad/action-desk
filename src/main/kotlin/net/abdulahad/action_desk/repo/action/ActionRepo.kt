@@ -70,6 +70,16 @@ object ActionRepo {
 			}
 			
 			onUI {
+				if (updated) {
+					val index = actions.indexOfFirst { it.id == action.id }
+					
+					if (index >= 0) {
+						actions[index] = action
+					} else {
+						actions.add(action)
+					}
+				}
+				
 				if (postSaveError == null) {
 					NotificationManager.success("Action ${action.name} saved")
 				} else {

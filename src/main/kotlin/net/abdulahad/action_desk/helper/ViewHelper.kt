@@ -2,6 +2,7 @@ package net.abdulahad.action_desk.helper
 
 import java.awt.Cursor
 import java.awt.Desktop
+import java.awt.Dimension
 import java.awt.Window
 import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
@@ -9,6 +10,8 @@ import java.awt.event.WindowAdapter
 import java.awt.event.WindowEvent
 import java.net.URI
 import javax.swing.JLabel
+import javax.swing.JTextArea
+import javax.swing.UIManager
 
 object ViewHelper {
 	
@@ -52,6 +55,29 @@ object ViewHelper {
 		}
 		
 		child.isVisible = true
+	}
+	
+	fun wrappedHint(text: String, width: Int = 320): JTextArea {
+		return JTextArea(text).apply {
+			lineWrap = true
+			wrapStyleWord = true
+			isEditable = false
+			isFocusable = false
+			isOpaque = false
+			border = null
+			
+			font = UIManager.getFont("Label.font")
+			foreground = UIManager.getColor("Label.disabledForeground")
+			
+			// Force width first so JTextArea can calculate wrapped height.
+			setSize(width, Short.MAX_VALUE.toInt())
+			
+			val preferred = preferredSize
+			
+			preferredSize = Dimension(width, preferred.height)
+			minimumSize = Dimension(0, preferred.height)
+			maximumSize = Dimension(width, preferred.height)
+		}
 	}
 	
 }

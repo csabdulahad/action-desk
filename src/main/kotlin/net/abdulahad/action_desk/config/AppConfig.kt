@@ -302,4 +302,32 @@ object AppConfig {
 		ConfigService.commit(ConfigKeys.ADCD_DISABLE_DIALOG, enable)
 	}
 	
+	
+	/*
+	 * Safety and Security
+	 * */
+	fun getDisableConfirmationOnAllActions(): Boolean {
+		return ConfigService.getBool(ConfigKeys.DISABLE_CONFIRMATION_ON_ALL_ACTIONS, false)
+	}
+	
+	fun setDisableConfirmationOnAllActions(enable: Boolean) {
+		ConfigService.commit(ConfigKeys.DISABLE_CONFIRMATION_ON_ALL_ACTIONS, enable)
+	}
+	
+	fun getPasswordProtectionEnabled(): Boolean {
+		return ConfigService.getBool(ConfigKeys.PASSWORD_PROTECTION_ENABLED, false)
+	}
+	
+	fun setPasswordProtectionEnabled(enable: Boolean) {
+		ConfigService.commit(ConfigKeys.PASSWORD_PROTECTION_ENABLED, enable)
+	}
+	
+	fun getSecurityMasterKeyEnvelope(): String {
+		return ConfigService.getString(ConfigKeys.SECURITY_MASTER_KEY_ENVELOPE, "")
+	}
+	
+	fun setSecurityMasterKeyEnvelope(value: String) {
+		ConfigService.commit(ConfigKeys.SECURITY_MASTER_KEY_ENVELOPE, value)
+	}
+
 }

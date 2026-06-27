@@ -75,7 +75,7 @@ object ActionScheduleService {
 					}
 					
 					App.logInfo("ActionSchedule: running '${action.name}'")
-					ActionRunner.runAction(action, diagnose = false)
+					ActionRunner.runAction(action, diagnose = false, automaticRun = true)
 					
 					val nextRunAt = ActionScheduleCalculator.nextRun(schedule, now)
 					ActionScheduleDao.markRan(schedule.id, now, nextRunAt)

@@ -8,6 +8,7 @@ import net.abdulahad.action_desk.view.ActionDesk
 import net.abdulahad.action_desk.view.settings.panel.WindowPanel
 import net.abdulahad.action_desk.view.settings.panel.GeneralPanel
 import net.abdulahad.action_desk.view.settings.panel.AdcdPanel
+import net.abdulahad.action_desk.view.settings.panel.SafetySecurityPanel
 import net.abdulahad.action_desk.view.settings.panel.StartupPanel
 import java.awt.*
 import javax.swing.*
@@ -15,7 +16,7 @@ import javax.swing.border.MatteBorder
 
 class Settings : JDialog(ActionDesk) {
 	
-	private val listItems = listOf("General", "Startup", "Window", "ADCD")
+	private val listItems = listOf("General", "Startup", "Window", "ADCD", "Safety and Security")
 	private lateinit var rightPanel: JPanel
 	private lateinit var leftScrollPane: JScrollPane
 	
@@ -26,6 +27,8 @@ class Settings : JDialog(ActionDesk) {
 	private lateinit var startupPanel: StartupPanel
 	private lateinit var windowPanel: WindowPanel
 	private lateinit var adcdPanel: AdcdPanel
+	private lateinit var safetySecurityPanel: SafetySecurityPanel
+	private val feedbackLabel = JLabel(" ")
 	
 	val panels = mutableMapOf<String, JPanel>()
 	
@@ -47,7 +50,7 @@ class Settings : JDialog(ActionDesk) {
 			rightPanel).apply {
 			putClientProperty("JSplitPane.style", "grip: none")
 			border = MatteBorder(Insets(1, 0, 0, 0), UIManager.getColor("Component.borderColor"))
-			dividerLocation = 120
+			dividerLocation = 155
 			isEnabled = false
 			dividerSize = 0
 		}
@@ -58,7 +61,7 @@ class Settings : JDialog(ActionDesk) {
 	private fun setupDialog() {
 		title = "Settings"
 		modalityType = ModalityType.APPLICATION_MODAL
-		minimumSize = Dimension(500, 360)
+		minimumSize = Dimension(560, 380)
 		isResizable = false
 		layout = BorderLayout()
 		
@@ -71,6 +74,7 @@ class Settings : JDialog(ActionDesk) {
 		startupPanel = StartupPanel(this)
 		windowPanel = WindowPanel(this)
 		adcdPanel = AdcdPanel(this)
+		safetySecurityPanel = SafetySecurityPanel(this, ::showFeedback)
 	}
 	
 	private fun setupRightPanel() {
@@ -80,6 +84,7 @@ class Settings : JDialog(ActionDesk) {
 		panels["Startup"] 	 = startupPanel
 		panels["Window"] 	 = windowPanel
 		panels["ADCD"] 		 = adcdPanel
+		panels["Safety and Security"] = safetySecurityPanel
 		
 		panels.forEach { (key, panel) ->
 			(panel as SettingsPanel).initUI()
@@ -144,13 +149,26 @@ class Settings : JDialog(ActionDesk) {
 		
 		rootPane.defaultButton = saveButton
 		
+		feedbackLabel.border = BorderFactory.createEmptyBorder(0, 12, 0, 0)
+		feedbackLabel.foreground = UIManager.getColor("Label.disabledForeground")
+		
 		// Layout
-		val bottomPanel = JPanel(FlowLayout(FlowLayout.RIGHT))
+		val bottomPanel = JPanel(BorderLayout())
 		bottomPanel.border = MatteBorder(Insets(1, 0, 0, 0), UIManager.getColor("Component.borderColor"))
 		bottomPanel.isOpaque = false
-		bottomPanel.add(buttonPanel)
+		bottomPanel.add(feedbackLabel, BorderLayout.CENTER)
+		bottomPanel.add(buttonPanel, BorderLayout.LINE_END)
 		
 		add(bottomPanel, BorderLayout.PAGE_END)
+	}
+	
+	private fun showFeedback(message: String, error: Boolean) {
+		feedbackLabel.text = message.ifBlank { " " }
+		feedbackLabel.foreground = if (error) {
+			UIManager.getColor("Component.error.focusedBorderColor") ?: Color(180, 0, 0)
+		} else {
+			UIManager.getColor("Label.foreground")
+		}
 	}
 	
 }

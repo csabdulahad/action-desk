@@ -19,6 +19,10 @@ data class Action (
 	var runAsAdmin: Boolean = false,
 	var singleton: Boolean = false,
 	var startWithAD: Boolean = false,
+
+	var confirmationBeforeRun: Boolean = false,
+	var passwordProtected: Boolean = false,
+	var encryptedPayload: String = "",
 	
 	var showWindow: Boolean = false,
 	var windowStyle: String = "Normal",
@@ -78,6 +82,7 @@ data class Action (
 			appendLine("arguments = $arguments")
 			
 			appendLine("runAsAdmin = $runAsAdmin, singleton = $singleton, startWithAD = $startWithAD")
+			appendLine("confirmationBeforeRun = $confirmationBeforeRun, passwordProtected = $passwordProtected, encryptedPayload = ${encryptedPayload.isNotBlank()}")
 			
 			appendLine("showWindow = $showWindow, windowStyle = $windowStyle, keepWindowOpen = $keepWindowOpen")
 			

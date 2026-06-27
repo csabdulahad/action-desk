@@ -5,6 +5,7 @@ import com.formdev.flatlaf.extras.components.FlatButton
 import com.formdev.flatlaf.extras.components.FlatPopupMenu
 import net.abdulahad.action_desk.App
 import net.abdulahad.action_desk.data.Env
+import net.abdulahad.action_desk.engine.action.ActionEditGuard
 import net.abdulahad.action_desk.engine.action.ActionRunner
 import net.abdulahad.action_desk.helper.CommonActions
 import net.abdulahad.action_desk.helper.Icons
@@ -29,7 +30,6 @@ import java.awt.event.MouseEvent
 import java.io.File
 import javax.swing.*
 import javax.swing.border.EmptyBorder
-import kotlin.random.Random
 
 class ActionListPanel: JPanel(BorderLayout()), ActionDeskPanel, ActionRepoListener {
 	
@@ -177,9 +177,7 @@ class ActionListPanel: JPanel(BorderLayout()), ActionDeskPanel, ActionRepoListen
 			edit.icon = Icons.EDIT.icon(20)
 			
 			edit.addActionListener {
-				val x = ActionEditor(ActionDesk, selectedAction!!)
-				x.setUploadCallback(this@ActionListPanel::refresh)
-				x.showIt()
+				openSelectedActionEditor()
 			}
 			
 			val delete = JMenuItem("Delete")
@@ -227,6 +225,19 @@ class ActionListPanel: JPanel(BorderLayout()), ActionDeskPanel, ActionRepoListen
 		listView.registerPopupMenu(popupMenu)
 	}
 
+	private fun openSelectedActionEditor() {
+		val action = selectedAction ?: return
+		val preparedAction = ActionEditGuard.prepareActionForEdit(action, ActionDesk) ?: return
+		
+		val editor = ActionEditor(
+			parentFrame = ActionDesk,
+			action = preparedAction.action,
+			unlockedPassword = preparedAction.unlockedPassword
+		)
+		editor.setUploadCallback(this@ActionListPanel::refresh)
+		editor.showIt()
+	}
+
 	private fun createListItem(action: Action): JPanel2 {
 		val panel = JPanel2(BorderLayout(12, 8))
 		
@@ -237,7 +248,7 @@ class ActionListPanel: JPanel(BorderLayout()), ActionDeskPanel, ActionRepoListen
 		statusIconPanel.isOpaque = false
 		statusIconPanel.border = EmptyBorder(4, 0, 0, 0)
 		
-		val lockStatus = Random.nextBoolean()
+		val lockStatus = action.passwordProtected
 		
 		val lockIcon =
 			if (lockStatus) Icons.LOCKED.icon(18)

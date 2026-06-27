@@ -3,6 +3,7 @@ package net.abdulahad.action_desk.view.settings.panel
 import com.formdev.flatlaf.extras.components.FlatCheckBox
 import com.formdev.flatlaf.extras.components.FlatSpinner
 import net.abdulahad.action_desk.config.AppConfig
+import net.abdulahad.action_desk.helper.ViewHelper
 import net.abdulahad.action_desk.view.settings.SettingsPanel
 import org.jdesktop.swingx.VerticalLayout
 import java.awt.BorderLayout
@@ -14,10 +15,8 @@ import java.awt.event.FocusEvent
 import javax.swing.JLabel
 import javax.swing.JPanel
 import javax.swing.JSpinner
-import javax.swing.JTextArea
 import javax.swing.SpinnerNumberModel
 import javax.swing.SwingUtilities
-import javax.swing.UIManager
 import javax.swing.border.EmptyBorder
 
 class AdcdPanel(private val frame: Window): JPanel(), SettingsPanel {
@@ -60,7 +59,7 @@ class AdcdPanel(private val frame: Window): JPanel(), SettingsPanel {
 	}
 	
 	private fun addFields() {
-		val infoField = wrappedHint(
+		val infoField = ViewHelper.wrappedHint(
 			"ADCD\n\nListens on localhost at the selected port.\n" +
 			"Enable network access to allow LAN devices to call it using your PC IP", 260)
 		
@@ -133,29 +132,6 @@ class AdcdPanel(private val frame: Window): JPanel(), SettingsPanel {
 		AppConfig.setAdcdPort((adcdPortField.value as Number).toInt())
 		
 		AppConfig.applyAdcd()
-	}
-	
-	private fun wrappedHint(text: String, width: Int = 320): JTextArea {
-		return JTextArea(text).apply {
-			lineWrap = true
-			wrapStyleWord = true
-			isEditable = false
-			isFocusable = false
-			isOpaque = false
-			border = null
-			
-			font = UIManager.getFont("Label.font")
-			foreground = UIManager.getColor("Label.disabledForeground")
-			
-			// Important: force width first so JTextArea can calculate wrapped height
-			setSize(width, Short.MAX_VALUE.toInt())
-			
-			val preferred = preferredSize
-			
-			preferredSize = Dimension(width, preferred.height)
-			minimumSize = Dimension(0, preferred.height)
-			maximumSize = Dimension(width, preferred.height)
-		}
 	}
 	
 }

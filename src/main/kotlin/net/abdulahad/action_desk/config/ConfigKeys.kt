@@ -23,4 +23,8 @@ object ConfigKeys {
 	const val ADCD_MUTE_SOUND 			= "adcd_mute_sound"
 	const val ADCD_DISABLE_DIALOG 		= "adcd_disable_dialog"
 	
+	const val DISABLE_CONFIRMATION_ON_ALL_ACTIONS 	= "disable_confirmation_on_all_actions"
+	const val PASSWORD_PROTECTION_ENABLED 			= "password_protection_enabled"
+	const val SECURITY_MASTER_KEY_ENVELOPE 			= "security_master_key_envelope"
+	
 }

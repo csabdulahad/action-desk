@@ -9,9 +9,9 @@ Run any command — CLI, script, `.exe`, or system action — from one simple, c
 📏 Small footprint – final jar around `50MB`, easy to download and run.
 
 # 📷Action Desk Screenshots
-| Action Desk                          | Tray Icon Integration                          | Settings UI                                   |
-|--------------------------------------|------------------------------------------------|-----------------------------------------------|
-| ![Alt1](screenshots/action_desk.png) | ![Alt2](screenshots/action_desk_tray_icon.png) | ![Alt3](screenshots/action_desk_settings.png) |
+| Action Desk                          | Action Scheduling                               | Settings UI                                   |
+|--------------------------------------|-------------------------------------------------|-----------------------------------------------|
+| ![Alt1](screenshots/action_desk.png) | ![Alt2](screenshots/action_desk_scheduling.png) | ![Alt3](screenshots/action_desk_settings.png) |
 
 
 # 🚀 Getting Started

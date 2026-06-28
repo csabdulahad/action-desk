@@ -5,7 +5,7 @@ import com.formdev.flatlaf.util.UIScale
 import net.abdulahad.action_desk.config.ConfigKeys
 import net.abdulahad.action_desk.config.ConfigService
 import net.abdulahad.action_desk.engine.schedule.ActionScheduleService
-import net.abdulahad.action_desk.model.ThemeDescriptor
+import net.abdulahad.action_desk.engine.theme.ThemeManager
 import net.abdulahad.action_desk.view.ActionDesk
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -23,15 +23,13 @@ object App {
 	
 	const val CODE_NAME: String = "action_desk"
 	const val NAME: String = "Action Desk"
-	const val VERSION: String = "2.0"
+	const val VERSION: String = "2.1.0"
 	const val DEVELOPER: String = "Abdul Ahad"
 	const val DEVELOPER_LINK: String = "https://abdulahad.net"
 
 	val logger: Logger by lazy {
 		LoggerFactory.getLogger("AppLogger")
 	}
-	
-	private lateinit var flatThemes: List<ThemeDescriptor>
 	
 	private lateinit var fontBold: Font
 	val FONT_BOLD: Font
@@ -75,6 +73,7 @@ object App {
 		FlatLaf.registerCustomDefaultsSource( "themes")
 		applyThemeConfig()
 		loadLookAndFeel()
+		ThemeManager.startSystemThemeWatcher()
 	}
 	
 	fun findFrameByName(name: String): JFrame? {
@@ -151,7 +150,7 @@ object App {
 		val themeName = ConfigService.getString(ConfigKeys.THEME, "dark")
 		
 		try {
-			val theme = ThemeDescriptor.getByThemeName(themeName).createInstance()
+			val theme = ThemeManager.createConfiguredLookAndFeel()
 			UIManager.setLookAndFeel(theme)
 		} catch (e: Exception) {
 			val msg = "Failed to load look and feel: $themeName\nCause: ${e.message}"

@@ -2,8 +2,8 @@ package net.abdulahad.action_desk.view.settings.panel
 
 import com.formdev.flatlaf.extras.components.FlatCheckBox
 import com.formdev.flatlaf.extras.components.FlatSpinner
-import net.abdulahad.action_desk.capitalizeFirst
 import net.abdulahad.action_desk.config.AppConfig
+import net.abdulahad.action_desk.engine.theme.ThemeManager
 import net.abdulahad.action_desk.view.settings.SettingsPanel
 import org.jdesktop.swingx.HorizontalLayout
 import org.jdesktop.swingx.VerticalLayout
@@ -22,7 +22,7 @@ import javax.swing.SwingUtilities
 
 class WindowPanel(private val frame: Window): JPanel(), SettingsPanel {
 	
-	private val themeOptions = arrayOf("Light", "Dark")
+	private val themeOptions = arrayOf("Light", "Dark", "System default")
 	private val themeDropdown = JComboBox(themeOptions)
 	
 	private val widthField  = FlatSpinner()
@@ -48,7 +48,7 @@ class WindowPanel(private val frame: Window): JPanel(), SettingsPanel {
 	}
 	
 	private fun themeDropdown() {
-		themeDropdown.preferredSize = Dimension(110, 28)
+		themeDropdown.preferredSize = Dimension(150, 28)
 		
 		val panel = JPanel().apply {
 			layout = VerticalLayout(6)
@@ -115,8 +115,8 @@ class WindowPanel(private val frame: Window): JPanel(), SettingsPanel {
 		/*
 		 * Theme
 		 * */
-		val theme = AppConfig.getTheme().capitalizeFirst()
-		themeDropdown.selectedItem = theme
+		val theme = AppConfig.getTheme()
+		themeDropdown.selectedItem = ThemeManager.displayName(theme)
 		
 		/*
 		 * Window size

@@ -1,16 +1,11 @@
 package net.abdulahad.action_desk.view.tray.menu
 
-import com.formdev.flatlaf.FlatLaf
 import com.formdev.flatlaf.extras.FlatSVGUtils
 import dorkbox.systemTray.MenuItem
-import net.abdulahad.action_desk.config.ConfigKeys
-import net.abdulahad.action_desk.config.ConfigService
+import net.abdulahad.action_desk.config.AppConfig
 import net.abdulahad.action_desk.lib.tray.TrayItem
-import net.abdulahad.action_desk.lib.tray.TrayMan
-import net.abdulahad.action_desk.model.ThemeDescriptor
-import net.abdulahad.action_desk.view.tray.A2Tray
+import net.abdulahad.action_desk.engine.theme.ThemeManager
 import java.awt.event.ActionListener
-import javax.swing.SwingUtilities
 
 class ThemeMenu: TrayItem(ID) {
 	
@@ -22,18 +17,19 @@ class ThemeMenu: TrayItem(ID) {
 		val settings = newMenu("Theme", "icon/brush_16.png")
 		
 		val checkedIcon = FlatSVGUtils.svg2image("/icon/checked.svg", 16, 16)
-		val currentTheme = ConfigService.getString(ConfigKeys.THEME, "dark")
+		val currentTheme = AppConfig.getTheme()
 		
 		listOf<MenuItem>(
 			newMenuItem("Light"),
-			newMenuItem("Dark")
+			newMenuItem("Dark"),
+			newMenuItem("System default")
 		).forEach { item ->
 			
 			item.callback = ActionListener {
 				this@ThemeMenu.toggleTheme(item.text)
 			}
 			
-			if (item.text.lowercase() == currentTheme.lowercase()) {
+			if (ThemeManager.normalize(item.text) == currentTheme) {
 				item.setImage(checkedIcon)
 			}
 			
@@ -44,20 +40,7 @@ class ThemeMenu: TrayItem(ID) {
 	}
 	
 	private fun toggleTheme(theme: String) {
-		val themeLower = theme.lowercase()
-		
-		ConfigService.commit(ConfigKeys.THEME, themeLower)
-		ConfigService.flush()
-		
-		SwingUtilities.invokeLater {
-			ThemeDescriptor
-				.getByThemeName(themeLower)
-				.classRef.java.getMethod("setup")
-				.invoke(null)
-
-			TrayMan.reinstall(A2Tray.ID, A2Tray::class.java)
-			FlatLaf.updateUI()
-		}
+		AppConfig.setTheme(theme, true)
 	}
 	
 }

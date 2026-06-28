@@ -1,16 +1,13 @@
 package net.abdulahad.action_desk.config
 
-import com.formdev.flatlaf.FlatLaf
 import net.abdulahad.action_desk.data.AppValues
 import net.abdulahad.action_desk.engine.action.ActionRunner
 import net.abdulahad.action_desk.engine.adcd.AdcdDaemon
 import net.abdulahad.action_desk.engine.shortcut.ActionDeskHKAction
+import net.abdulahad.action_desk.engine.theme.ThemeManager
 import net.abdulahad.action_desk.engine.shortcut.ShortcutManager
 import net.abdulahad.action_desk.helper.CommonActions
-import net.abdulahad.action_desk.lib.tray.TrayMan
-import net.abdulahad.action_desk.model.ThemeDescriptor
 import net.abdulahad.action_desk.view.ActionDesk
-import net.abdulahad.action_desk.view.tray.A2Tray
 import java.awt.Point
 import java.io.File
 import javax.swing.SwingUtilities
@@ -76,27 +73,21 @@ object AppConfig {
 	 * */
 	fun applyTheme(theme: String) {
 		SwingUtilities.invokeLater {
-			ThemeDescriptor
-				.getByThemeName(theme)
-				.classRef.java.getMethod("setup")
-				.invoke(null)
-			
-			TrayMan.reinstall(A2Tray.ID, A2Tray::class.java)
-			FlatLaf.updateUI()
+			ThemeManager.applyTheme(theme)
 		}
 	}
 	
 	fun setTheme(theme: String, apply: Boolean = false) {
-		val t = theme.lowercase()
+		val t = ThemeManager.normalize(theme)
 		val current = getTheme()
 		
-		if (apply && current != t) applyTheme(t)
-		
 		ConfigService.commit(ConfigKeys.THEME, t)
+		
+		if (apply && current != t) applyTheme(t)
 	}
 	
 	fun getTheme(): String {
-		return ConfigService.getString(ConfigKeys.THEME, "light").lowercase()
+		return ThemeManager.normalize(ConfigService.getString(ConfigKeys.THEME, "light"))
 	}
 	
 	

@@ -23,7 +23,7 @@ object App {
 	
 	const val CODE_NAME: String = "action_desk"
 	const val NAME: String = "Action Desk"
-	const val VERSION: String = "1.0"
+	const val VERSION: String = "2.0"
 	const val DEVELOPER: String = "Abdul Ahad"
 	const val DEVELOPER_LINK: String = "https://abdulahad.net"
 

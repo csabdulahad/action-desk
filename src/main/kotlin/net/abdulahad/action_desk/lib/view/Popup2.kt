@@ -11,6 +11,7 @@ import javax.swing.KeyStroke
 import javax.swing.SwingUtilities
 
 class Popup2 {
+	
 	private var dialog: JDialog? = null
 	private lateinit var content: JPanel
 	private var decorateDialogCallback: ((JDialog) -> Unit)? = null
@@ -89,4 +90,5 @@ class Popup2 {
 		
 		dialog?.location = Point(x.coerceAtLeast(screenX), y.coerceAtLeast(screenY))
 	}
+	
 }

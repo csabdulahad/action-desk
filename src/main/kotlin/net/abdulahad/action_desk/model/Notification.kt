@@ -10,6 +10,7 @@ data class Notification(
 	val isSilent: Boolean,
 	val at: LocalDateTime = LocalDateTime.now()
 ) {
+	
 	fun time(): String {
 		return at.format(DateTimeFormatter.ofPattern("HH:mm:ss"))
 	}
@@ -17,4 +18,5 @@ data class Notification(
 	fun date(): String {
 		return at.format(DateTimeFormatter.ofPattern("dd MMM, yyyy", Locale.ENGLISH))
 	}
+	
 }

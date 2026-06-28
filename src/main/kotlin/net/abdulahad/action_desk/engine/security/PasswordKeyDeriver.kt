@@ -31,9 +31,9 @@ object PasswordKeyDeriver {
 		val passwordChars = password.toCharArray()
 		
 		try {
-			val salt = Base64.getDecoder().decode(saltBase64)
-			val spec = PBEKeySpec(passwordChars, salt, iterations, keyLengthBits)
-			val factory = SecretKeyFactory.getInstance(ALGORITHM)
+			val salt 	 = Base64.getDecoder().decode(saltBase64)
+			val spec 	 = PBEKeySpec(passwordChars, salt, iterations, keyLengthBits)
+			val factory  = SecretKeyFactory.getInstance(ALGORITHM)
 			val keyBytes = factory.generateSecret(spec).encoded
 			
 			return SecretKeySpec(keyBytes, "AES")

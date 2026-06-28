@@ -60,4 +60,5 @@ object WinHelper {
 		
 		ghostClickNudge(targetPid)
 	}
+	
 }

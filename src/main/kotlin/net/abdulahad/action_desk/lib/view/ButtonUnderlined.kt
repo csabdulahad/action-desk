@@ -9,6 +9,7 @@ import java.awt.event.MouseEvent
 import javax.swing.border.EmptyBorder
 
 class ButtonUnderlined(private val txt: String) : FlatButton() {
+	
 	init {
 		text = html(false)
 		horizontalAlignment = LEFT
@@ -36,4 +37,5 @@ class ButtonUnderlined(private val txt: String) : FlatButton() {
 	private fun html(underlined: Boolean): String {
 		return if (underlined) "<html><u>$txt</u></html>" else "<html>$txt</html>"
 	}
+	
 }

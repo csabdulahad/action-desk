@@ -5,6 +5,7 @@ import java.util.LinkedHashMap
 import java.util.concurrent.atomic.AtomicInteger
 
 object Ben {
+	
     private val marks: MutableMap<String, BenchData> = Collections.synchronizedMap(LinkedHashMap())
     private val maxLabelWidth = AtomicInteger(5)
 
@@ -84,4 +85,5 @@ object Ben {
         marks.clear()
         maxLabelWidth.set(5)
     }
+	
 }

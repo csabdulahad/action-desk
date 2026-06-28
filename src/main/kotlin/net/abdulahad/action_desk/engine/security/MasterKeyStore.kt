@@ -7,6 +7,7 @@ import javax.crypto.AEADBadTagException
 import javax.crypto.SecretKey
 
 object MasterKeyStore {
+	
 	private const val MASTER_KEY_LENGTH_BYTES = 32
 	
 	private val random = SecureRandom()
@@ -31,7 +32,7 @@ object MasterKeyStore {
 	}
 	
 	fun unwrap(password: String): ByteArray {
-		val envelope = readEnvelope()
+		val envelope 	= readEnvelope()
 		val wrappingKey = deriveWrappingKey(password, envelope)
 		
 		return try {
@@ -77,9 +78,9 @@ object MasterKeyStore {
 	}
 	
 	private fun wrapMasterKey(masterKey: ByteArray, password: String): CryptoEnvelope {
-		val salt = PasswordKeyDeriver.newSaltBase64()
+		val salt 		= PasswordKeyDeriver.newSaltBase64()
 		val wrappingKey = PasswordKeyDeriver.deriveKey(password, salt)
-		val encrypted = AesGcm.encrypt(masterKey, wrappingKey)
+		val encrypted 	= AesGcm.encrypt(masterKey, wrappingKey)
 		
 		return CryptoEnvelope(
 			version = 1,

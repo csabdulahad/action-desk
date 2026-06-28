@@ -9,6 +9,7 @@ import javax.swing.Icon
 import javax.swing.SwingUtilities
 
 class ButtonBadge : FlatButton() {
+	
 	var badgeIcon: Icon? = null
 		set(value) {
 			field = value
@@ -75,4 +76,5 @@ class ButtonBadge : FlatButton() {
 			g2.dispose()
 		}
 	}
+	
 }

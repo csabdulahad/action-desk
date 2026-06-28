@@ -58,6 +58,7 @@ object ActionRunGuard {
 		}
 		
 		val title = if (diagnose) "Confirm Diagnose Run" else "Confirm Action"
+		
 		val message = if (diagnose) {
 			"Run diagnosis for '${action.name}'?"
 		} else {

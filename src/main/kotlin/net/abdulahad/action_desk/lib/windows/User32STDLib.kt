@@ -8,6 +8,7 @@ import com.sun.jna.platform.win32.WinDef.HWND
 import com.sun.jna.win32.StdCallLibrary
 
 interface User32STDLib : StdCallLibrary {
+	
 	fun SetForegroundWindow(hWnd: HWND): Boolean
 	fun ShowWindow(hWnd: HWND, nCmdShow: Int): Boolean
 	fun IsIconic(hWnd: HWND): Boolean
@@ -23,4 +24,5 @@ interface User32STDLib : StdCallLibrary {
 	interface EnumWindowsProc : StdCallLibrary.StdCallCallback {
 		fun callback(hWnd: HWND, data: Pointer?): Boolean
 	}
+	
 }

@@ -8,6 +8,7 @@ import com.sun.jna.platform.win32.WinUser;
 import com.sun.jna.platform.win32.WinUser.KBDLLHOOKSTRUCT;
 
 public class WinKeyBlocker {
+	
     // Hook handle
     private static WinUser.HHOOK hhk;
     private static User32 lib = User32.INSTANCE;

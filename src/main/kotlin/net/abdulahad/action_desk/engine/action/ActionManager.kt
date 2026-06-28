@@ -161,8 +161,8 @@ object ActionManager {
 			.redirectErrorStream(true)
 			.start()
 		
-		val output = process.inputStream.bufferedReader().use { it.readText() }.trim()
-		val lines = output.lines().filter { it.isNotBlank() }
+		val output 	   = process.inputStream.bufferedReader().use { it.readText() }.trim()
+		val lines 	   = output.lines().filter { it.isNotBlank() }
 		val numOfLines = lines.size
 		
 		if (output.contains("No tasks are running") || numOfLines != 1) {
@@ -226,11 +226,13 @@ object ActionManager {
 	fun registerActionPID(actionId: Int, pid: Long?) {
 		if (pid == null) {
 			val removed = actionPID.remove(actionId)
+			
 			if (removed != null) {
 				val msg = "Zombie action PID discovered"
 				println(msg)
 				App.logWarn(msg)
 			}
+			
 			return
 		}
 		

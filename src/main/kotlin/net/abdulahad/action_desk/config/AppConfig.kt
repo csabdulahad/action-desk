@@ -17,6 +17,8 @@ import javax.swing.SwingUtilities
 
 object AppConfig {
 	
+	const val DEFAULT_WINDOW_SIZE = "450x500"
+	
 	const val DEFAULT_ADCD_PORT = 4788
 	const val DEFAULT_ADCD_HOST_LOCAL = "127.0.0.1"
 	const val DEFAULT_ADCD_HOST_NETWORK = "0.0.0.0"
@@ -99,7 +101,7 @@ object AppConfig {
 	
 	
 	/*
-	 * Search bar focus
+	 * Window sizing
 	 * */
 	fun applyWindowSize(value: Point) {
 		ActionDesk.applyWindowSize(value)
@@ -114,7 +116,7 @@ object AppConfig {
 	}
 	
 	fun getWindowSize(): Point {
-		val value  = ConfigService.getString(ConfigKeys.WINDOW_SIZE, "450x500")
+		val value  = ConfigService.getString(ConfigKeys.WINDOW_SIZE, DEFAULT_WINDOW_SIZE)
 		val values = value.split("x")
 		return Point(values[0].toInt(), values[1].toInt())
 	}
@@ -184,6 +186,7 @@ object AppConfig {
 			ConfigService.commit(ConfigKeys.SHOW_WINDOW_IN_CENTER, selected)
 		}
 	}
+	
 	
 	/*
 	 * ActionDesk global hotkey

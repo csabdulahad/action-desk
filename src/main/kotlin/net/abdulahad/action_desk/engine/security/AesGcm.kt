@@ -8,7 +8,7 @@ import javax.crypto.spec.GCMParameterSpec
 
 object AesGcm {
 	
-	private const val TRANSFORMATION = "AES/GCM/NoPadding"
+	private const val TRANSFORMATION  = "AES/GCM/NoPadding"
 	private const val TAG_LENGTH_BITS = 128
 	private const val IV_LENGTH_BYTES = 12
 	
@@ -30,7 +30,7 @@ object AesGcm {
 	}
 	
 	fun decrypt(ivBase64: String, ciphertextBase64: String, key: SecretKey): ByteArray {
-		val iv = Base64.getDecoder().decode(ivBase64)
+		val iv		   = Base64.getDecoder().decode(ivBase64)
 		val ciphertext = Base64.getDecoder().decode(ciphertextBase64)
 		
 		val cipher = Cipher.getInstance(TRANSFORMATION)

@@ -12,7 +12,7 @@ import javax.swing.ImageIcon
 
 object Icons {
 	
-	private val JUI_ICON_EXTENSIONS = setOf("svg", "png", "jpg", "jpeg")
+	private val ICON_EXTENSIONS = setOf("svg", "png", "jpg", "jpeg")
 	
 	const val ACTION_DESK = "actionDesk"
 	const val ADD = "add"
@@ -190,22 +190,29 @@ object Icons {
 		override fun paintIcon(c: Component?, g: Graphics, x: Int, y: Int) {
 			val sourceWidth = icon.iconWidth.takeIf { it > 0 } ?: width
 			val sourceHeight = icon.iconHeight.takeIf { it > 0 } ?: height
+			
 			val scale = minOf(
 				width.toDouble() / sourceWidth.toDouble(),
 				height.toDouble() / sourceHeight.toDouble()
 			)
+			
 			val drawWidth = (sourceWidth * scale).toInt().coerceAtLeast(1)
 			val drawHeight = (sourceHeight * scale).toInt().coerceAtLeast(1)
+			
 			val drawX = x + ((width - drawWidth) / 2)
 			val drawY = y + ((height - drawHeight) / 2)
+			
 			val g2 = g.create() as Graphics2D
 			
 			g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC)
 			g2.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY)
 			g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON)
+			
 			g2.translate(drawX, drawY)
 			g2.scale(scale, scale)
+			
 			icon.paintIcon(c, g2, 0, 0)
+			
 			g2.dispose()
 		}
 	}
@@ -236,8 +243,10 @@ object Icons {
 			else -> {
 				val w = iconWidth
 				val h = iconHeight
+				
 				val img = BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB)
 				val g = img.createGraphics()
+				
 				paintIcon(null, g, 0, 0)
 				g.dispose()
 				ImageIcon(img)
@@ -259,7 +268,7 @@ object Icons {
 		 * Use exactly what caller provided.
 		 */
 		if (file.isAbsolute) {
-			return loadJuiIconFile(file, size)
+			return loadIconFile(file, size)
 		}
 		
 		val cleanRef = ref
@@ -276,16 +285,16 @@ object Icons {
 		 *   "ex.svg"
 		 *   "icons/svg/run.svg"
 		 */
-		if (hasJuiIconExtension(cleanRef)) {
-			loadJuiIconFile(File("${Env.APP_FOLDER}/icons/$cleanRef"), size)?.let {
+		if (hasIconExtension(cleanRef)) {
+			loadIconFile(File("${Env.APP_FOLDER}/icons/$cleanRef"), size)?.let {
 				return it
 			}
 			
-			loadJuiResourceIcon(cleanRef, size)?.let {
+			loadResourceIcon(cleanRef, size)?.let {
 				return it
 			}
 			
-			loadJuiResourceIcon("icons/$cleanRef", size)?.let {
+			loadResourceIcon("icons/$cleanRef", size)?.let {
 				return it
 			}
 			
@@ -311,8 +320,9 @@ object Icons {
 			return null
 		}
 		
-		val safeWidth = width.coerceAtLeast(1)
+		val safeWidth  = width.coerceAtLeast(1)
 		val safeHeight = height.coerceAtLeast(1)
+		
 		val file = File(ref)
 		
 		/*
@@ -320,7 +330,7 @@ object Icons {
 		 * Use exactly what caller provided.
 		 */
 		if (file.isAbsolute) {
-			return loadJuiImageFile(file, safeWidth, safeHeight)
+			return loadImageFile(file, safeWidth, safeHeight)
 		}
 		
 		val cleanRef = ref
@@ -332,16 +342,16 @@ object Icons {
 		 * First try app-folder icons.
 		 * Then try bundled resources.
 		 */
-		if (hasJuiIconExtension(cleanRef)) {
-			loadJuiImageFile(File("${Env.APP_FOLDER}/icons/$cleanRef"), safeWidth, safeHeight)?.let {
+		if (hasIconExtension(cleanRef)) {
+			loadImageFile(File("${Env.APP_FOLDER}/icons/$cleanRef"), safeWidth, safeHeight)?.let {
 				return it
 			}
 			
-			loadJuiResourceImage(cleanRef, safeWidth, safeHeight)?.let {
+			loadResourceImage(cleanRef, safeWidth, safeHeight)?.let {
 				return it
 			}
 			
-			loadJuiResourceImage("icons/$cleanRef", safeWidth, safeHeight)?.let {
+			loadResourceImage("icons/$cleanRef", safeWidth, safeHeight)?.let {
 				return it
 			}
 			
@@ -351,24 +361,24 @@ object Icons {
 		/*
 		 * Plain image/icon name:
 		 * Try the app icons folder and bundled icons using the same name-without-
-		 * extension idea as JUI icon support, but include jpg/jpeg too.
+		 * extension idea as ACDC icon support, but include jpg/jpeg too.
 		 */
-		JUI_ICON_EXTENSIONS.forEach { ext ->
-			loadJuiImageFile(File("${Env.APP_FOLDER}/icons/$cleanRef.$ext"), safeWidth, safeHeight)?.let {
+		ICON_EXTENSIONS.forEach { ext ->
+			loadImageFile(File("${Env.APP_FOLDER}/icons/$cleanRef.$ext"), safeWidth, safeHeight)?.let {
 				return it
 			}
 		}
 		
-		loadJuiResourceImage("icons/svg/$cleanRef.svg", safeWidth, safeHeight)?.let {
+		loadResourceImage("icons/svg/$cleanRef.svg", safeWidth, safeHeight)?.let {
 			return it
 		}
 		
-		loadJuiResourceImage("icons/png/$cleanRef.png", safeWidth, safeHeight)?.let {
+		loadResourceImage("icons/png/$cleanRef.png", safeWidth, safeHeight)?.let {
 			return it
 		}
 		
-		JUI_ICON_EXTENSIONS.forEach { ext ->
-			loadJuiResourceImage("icons/$cleanRef.$ext", safeWidth, safeHeight)?.let {
+		ICON_EXTENSIONS.forEach { ext ->
+			loadResourceImage("icons/$cleanRef.$ext", safeWidth, safeHeight)?.let {
 				return it
 			}
 		}
@@ -376,14 +386,14 @@ object Icons {
 		return null
 	}
 	
-	private fun loadJuiIconFile(file: File, size: Int): Icon? {
+	private fun loadIconFile(file: File, size: Int): Icon? {
 		if (!file.exists() || !file.isFile) {
 			return null
 		}
 		
 		val ext = file.extension.lowercase()
 		
-		if (ext !in JUI_ICON_EXTENSIONS) {
+		if (ext !in ICON_EXTENSIONS) {
 			return null
 		}
 		
@@ -408,7 +418,7 @@ object Icons {
 		}
 	}
 	
-	private fun loadJuiResourceIcon(resourcePath: String, size: Int): Icon? {
+	private fun loadResourceIcon(resourcePath: String, size: Int): Icon? {
 		if (!Poth.resourceExists(resourcePath)) {
 			return null
 		}
@@ -417,7 +427,7 @@ object Icons {
 			.substringAfterLast('.', "")
 			.lowercase()
 		
-		if (ext !in JUI_ICON_EXTENSIONS) {
+		if (ext !in ICON_EXTENSIONS) {
 			return null
 		}
 		
@@ -438,14 +448,14 @@ object Icons {
 		}
 	}
 	
-	private fun loadJuiImageFile(file: File, width: Int, height: Int): Icon? {
+	private fun loadImageFile(file: File, width: Int, height: Int): Icon? {
 		if (!file.exists() || !file.isFile) {
 			return null
 		}
 		
 		val ext = file.extension.lowercase()
 		
-		if (ext !in JUI_ICON_EXTENSIONS) {
+		if (ext !in ICON_EXTENSIONS) {
 			return null
 		}
 		
@@ -467,7 +477,7 @@ object Icons {
 		}
 	}
 	
-	private fun loadJuiResourceImage(resourcePath: String, width: Int, height: Int): Icon? {
+	private fun loadResourceImage(resourcePath: String, width: Int, height: Int): Icon? {
 		if (!Poth.resourceExists(resourcePath)) {
 			return null
 		}
@@ -476,7 +486,7 @@ object Icons {
 			.substringAfterLast('.', "")
 			.lowercase()
 		
-		if (ext !in JUI_ICON_EXTENSIONS) {
+		if (ext !in ICON_EXTENSIONS) {
 			return null
 		}
 		
@@ -501,13 +511,13 @@ object Icons {
 		}
 	}
 	
-	private fun hasJuiIconExtension(path: String): Boolean {
+	private fun hasIconExtension(path: String): Boolean {
 		val ext = path
 			.substringAfterLast('/', path)
 			.substringAfterLast('.', "")
 			.lowercase()
 		
-		return ext in JUI_ICON_EXTENSIONS
+		return ext in ICON_EXTENSIONS
 	}
 	
 }

@@ -28,6 +28,7 @@ class Settings : JDialog(ActionDesk) {
 	private lateinit var windowPanel: WindowPanel
 	private lateinit var adcdPanel: AdcdPanel
 	private lateinit var safetySecurityPanel: SafetySecurityPanel
+	
 	private val feedbackLabel = JLabel(" ")
 	
 	val panels = mutableMapOf<String, JPanel>()

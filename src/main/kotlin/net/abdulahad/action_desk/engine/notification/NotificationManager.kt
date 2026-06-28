@@ -5,15 +5,16 @@ import java.time.LocalDateTime
 import kotlin.random.Random
 
 object NotificationManager {
+	
 	private val items = mutableListOf<Notification>()
 	private val listeners = mutableListOf<NotificationListener>()
 	
 	private fun getIcon(type: String): String {
 		return when (type) {
-			"success" -> "success"
-			"error" -> "error"
-			"info" -> "info"
-			else -> "warn"
+			"success" 	-> "success"
+			"error" 	-> "error"
+			"info" 		-> "info"
+			else 		-> "warn"
 		}
 	}
 	
@@ -83,4 +84,5 @@ object NotificationManager {
 			}
 		}
 	}
+	
 }

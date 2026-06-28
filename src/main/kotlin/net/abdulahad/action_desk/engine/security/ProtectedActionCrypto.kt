@@ -20,6 +20,7 @@ object ProtectedActionCrypto {
 		action.command = payload.command
 		action.arguments = payload.arguments
 		action.startDirectory = payload.startDirectory
+		
 		return action
 	}
 	
@@ -27,12 +28,16 @@ object ProtectedActionCrypto {
 		action.command = ""
 		action.arguments = ""
 		action.startDirectory = ""
+		
 		return action
 	}
 	
 	fun encryptActionPayload(action: Action, password: String): Action {
-		action.encryptedPayload = encryptPayload(payloadFromAction(action), password)
+		val protectedActionPayload  = payloadFromAction(action)
+		action.encryptedPayload 	= encryptPayload(protectedActionPayload, password)
+		
 		clearPlainPayload(action)
+		
 		return action
 	}
 	
@@ -45,7 +50,9 @@ object ProtectedActionCrypto {
 			return action
 		}
 		
-		return applyPayload(action, decryptPayload(action.encryptedPayload, password))
+		val decryptedActionPayload = decryptPayload(action.encryptedPayload, password)
+		
+		return applyPayload(action, decryptedActionPayload)
 	}
 	
 	fun encryptPayload(payload: ProtectedActionPayload, password: String): String {
@@ -54,6 +61,7 @@ object ProtectedActionCrypto {
 		
 		try {
 			plainBytes = Json.stringify(payload).toByteArray(StandardCharsets.UTF_8)
+			
 			val secretKey = SecretKeySpec(masterKey, "AES")
 			val encrypted = AesGcm.encrypt(plainBytes, secretKey)
 			
@@ -84,7 +92,8 @@ object ProtectedActionCrypto {
 			validateEnvelope(envelope)
 			
 			val secretKey = SecretKeySpec(masterKey, "AES")
-			plainBytes = AesGcm.decrypt(envelope.iv, envelope.ciphertext, secretKey)
+			plainBytes 	  = AesGcm.decrypt(envelope.iv, envelope.ciphertext, secretKey)
+			
 			val json = String(plainBytes, StandardCharsets.UTF_8)
 			
 			return Json.mapper.readValue(json, ProtectedActionPayload::class.java)

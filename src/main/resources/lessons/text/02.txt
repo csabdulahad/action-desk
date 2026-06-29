@@ -1,0 +1,17 @@
+**Create your first action**
+
+From home screen, click on the plus icon from bottom-right or the "Create new action" button:
+[image:center: 01_new_action.png]
+
+- Name the action with an icon so you can recognise it quickly later
+- Add any global shortcut to run the action from anywhere if needed
+[image: 01_action_general.png]
+
+-
+
+- Set the **start folder** if the action should run from a specific working directory.
+- Add the command or script you want to run with required argument.
+
+[image: 02_action_example.png | Example: Opens the users desktop folder]
+
+Once saved, you can run it from Action Desk whenever you need it.

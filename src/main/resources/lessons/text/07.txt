@@ -1,0 +1,17 @@
+**ActionDesk Communication Daemon**
+
+ADCD lets scripts communicate with Action Desk while they run.
+
+[image: 07_adcd.png]
+
+Use [highlight: ADCD] when a script needs to show a local dialog, ask for input, play a sound, or report something back to the user.
+-
+ADCD listens locally on your selected port, so your scripts can call it using simple JSON requests.
+-
+This is useful for background scripts that still need safe user interaction.
+-
+You can enable, disable, mute sounds, or change the port from [highlight: Settings > ADCD].
+-
+For the full JSON format and examples, open [highlight: ADCD Spec] from the More menu.
+
+ADCD turns Action Desk from a task runner into a small local automation companion.

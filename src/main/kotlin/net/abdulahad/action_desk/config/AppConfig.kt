@@ -180,6 +180,18 @@ object AppConfig {
 	
 	
 	/*
+	 * Learning window
+	 */
+	fun getLearningShowOnStartup(): Boolean {
+		return ConfigService.getBool(ConfigKeys.LEARNING_SHOW_ON_STARTUP, true)
+	}
+	
+	fun setLearningShowOnStartup(enable: Boolean) {
+		ConfigService.commit(ConfigKeys.LEARNING_SHOW_ON_STARTUP, enable)
+	}
+	
+	
+	/*
 	 * ActionDesk global hotkey
 	 * */
 	fun applyADHotKey(value: String) {

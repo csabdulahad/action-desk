@@ -1,0 +1,11 @@
+**Safety and security**
+
+Action Desk can run powerful commands, so treat actions like trusted scripts.
+
+[image: 04_safety_security.png]
+
+[highlight: confirmation]: Ask for confirmation before running a critical action, so mistakes are less likely.
+-
+[highlight: password check]: Prevent unauthorised users from running sensitive actions.
+-
+[red: Important:] Action Desk helps you run tasks safely, but the command still does exactly what you ask it to do.

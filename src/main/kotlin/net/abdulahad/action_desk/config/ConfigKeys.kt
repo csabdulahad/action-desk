@@ -27,4 +27,5 @@ object ConfigKeys {
 		const val PASSWORD_PROTECTION_ENABLED 			= "password_protection_enabled"
 		const val SECURITY_MASTER_KEY_ENVELOPE 			= "security_master_key_envelope"
 	
+		const val LEARNING_SHOW_ON_STARTUP				= "show_learning_on_startup"
 }

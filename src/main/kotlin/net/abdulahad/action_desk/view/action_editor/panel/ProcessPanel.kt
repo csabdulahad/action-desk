@@ -45,7 +45,7 @@ class ProcessPanel: JPanel(), ActionEditorPanel {
 		runAs.text = "Run as administrator"
 		singleton.text = "Single instance"
 		startWithAD.text = "Start with ActionDesk"
-		bringWindowFront.text = "Bring Window Front"
+		bringWindowFront.text = "Bring window front (experimental)"
 	}
 	
 	private fun setupPanel() {

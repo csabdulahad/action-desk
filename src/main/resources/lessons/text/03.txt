@@ -1,0 +1,17 @@
+**Action Process controls**
+
+Some actions start or manage long-running apps, tools, or background processes.
+
+Use these options when an action should do more than simply run once and finish.
+
+[image: 03_process_controls.png]
+-
+[highlight: Run as administrator]: starts the action with elevated permission. Use it only when the command needs admin access.
+-
+[highlight: Start with Action Desk]: runs the action automatically when Action Desk starts.
+-
+[highlight: Single instance]: prevents duplicate runs. If the action is already running, Action Desk will not start another copy.
+-
+[highlight: Bring window front]: tries to bring the running app window to the front instead of starting it again.
+-
+[red: Note:] Bring window front is experimental and may not work with every app or window.

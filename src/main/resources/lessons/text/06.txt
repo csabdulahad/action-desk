@@ -1,0 +1,20 @@
+**Schedule options**
+
+Schedule options let an action run automatically.
+
+[image: 06_schedule.png]
+
+-
+Turn on [highlight: Enable schedule] when an action should run without being started manually.
+-
+Use [highlight: Repeat] to run an action every few minutes, such as every 15 minutes.
+-
+Use [highlight: Daily] to run an action at one or more times every day.
+-
+Use [highlight: Weekly] to run an action on selected days of the week.
+-
+Weekly schedules can use [highlight: shared times] for all selected days, or [highlight: custom times] for specific days.
+-
+Action Desk calculates the next run time after saving and again after each scheduled run.
+
+[red: Note:] Scheduled actions only run while Action Desk is running.

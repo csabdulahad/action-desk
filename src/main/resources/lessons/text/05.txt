@@ -1,0 +1,21 @@
+**Window options**
+
+Window options control how Action Desk starts the action process. This feature is especially useful for CLI tools.
+
+[image: 05_window.png]
+
+[highlight: Show window] enables the window style option for the action.
+-
+If [highlight: Show window] is off, Action Desk tries to run the action without opening a new window.
+-
+If the action uses [highlight: Run as administrator], Action Desk cannot use the normal no-new-window mode, so it starts the process hidden instead.
+-
+[highlight: Normal] starts the process with a normal window.
+-
+[highlight: Minimized] starts the process minimized.
+-
+[highlight: Maximized] starts the process maximized.
+-
+[highlight: Hidden] starts the process hidden.
+
+[red: Note:] Some apps may ignore window style requests, especially GUI apps that control their own windows.

@@ -1,0 +1,18 @@
+[image:left: ad.png]
+
+**Welcome to Action Desk!**
+
+Action Desk helps you run repeated tasks from one clean desktop window.
+Use [highlight: Alt+`] global shortcut to open action desk. The shortcut can be changed from settings.
+
+-
+Action Desk features:
+- Create **actions** for scripts, commands, tools, or workflows
+- Run actions from the main window or bind them to **global shortcuts**
+- Use **single instance** to avoid duplicate runs
+- Use confirmations, passwords, and logs to run tasks more safely
+- Use **ADCD** to show dialogs, ask for user inputs, play sounds from background scripts
+
+-
+
+Action Desk is built to make useful work **faster**, **safer**, and easier to control.

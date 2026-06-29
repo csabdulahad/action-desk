@@ -22,6 +22,7 @@ import net.abdulahad.action_desk.onUIDelayed
 import net.abdulahad.action_desk.view.action_editor.ActionEditor
 import net.abdulahad.action_desk.view.dashboard.ActionListPanel
 import net.abdulahad.action_desk.view.dashboard.ActionProcessPanel
+import net.abdulahad.action_desk.view.learning.LearningWindow
 import net.abdulahad.action_desk.view.settings.Settings
 import java.awt.*
 import java.awt.event.*
@@ -65,6 +66,7 @@ object ActionDesk : JDialog(), NotificationListener {
 	private val actionIcon = Icons.LIGHTNING.icon(20)
 	
 	private var resizeDebounceTimer: Timer? = null
+	private var learningWindowShownInSession: Boolean = false
 	
 	init {
 		setupFrame()
@@ -208,6 +210,14 @@ object ActionDesk : JDialog(), NotificationListener {
 				}
 			}
 			
+			val gettingStarted  = JMenuItem("Getting Started").apply {
+				icon = Icons.LEARN.icon()
+				
+				addActionListener {
+					showLearningWindow()
+				}
+			}
+			
 			val adcdSpec  = JMenuItem("ADCD Spec").apply {
 				icon = Icons.LEARN.icon()
 				
@@ -235,9 +245,11 @@ object ActionDesk : JDialog(), NotificationListener {
 			}
 			
 			add(settings)
-			add(adcdSpec)
 			add(logFolder)
-			add(marketPlace)
+			// add(marketPlace)
+			add(JSeparator())
+			add(gettingStarted)
+			add(adcdSpec)
 			add(about)
 			add(JSeparator())
 			add(restart)
@@ -499,6 +511,7 @@ object ActionDesk : JDialog(), NotificationListener {
 			
 			isVisible = true
 			toFront()
+			showLearningWindowOnStartup()
 			
 			if (!windowListenerAttached) {
 				windowListenerAttached = true
@@ -516,6 +529,26 @@ object ActionDesk : JDialog(), NotificationListener {
 	fun hideFrame() {
 		searchField.text = ""
 		frameVisibility(false)
+	}
+	
+	private fun showLearningWindowOnStartup() {
+		if (learningWindowShownInSession) return
+		if (!AppConfig.getLearningShowOnStartup()) return
+		if (!LearningWindow.hasLessons()) return
+		
+		learningWindowShownInSession = true
+		onUIDelayed(0.3f) {
+			showLearningWindow()
+		}
+	}
+	
+	private fun showLearningWindow() {
+		if (!LearningWindow.hasLessons()) {
+			App.setMessage("No learning lessons found.")
+			return
+		}
+		
+		LearningWindow(this@ActionDesk).showIt()
 	}
 	
 	fun clearSearchFilter() {
